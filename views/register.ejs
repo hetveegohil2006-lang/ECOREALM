@@ -1,0 +1,441 @@
+<%- include('partials/header') %>
+
+<div class="scanline"></div>
+
+<div class="hud-main-wrapper register-page">
+  <!-- Glowing Background Grid -->
+  <div class="hud-grid-background"></div>
+  <div class="aurora-glow"></div>
+  
+  <!-- THREE.JS CONTAINER FOR HOLOGRAPHIC PLANET -->
+  <div id="hologram-viewport" class="hologram-viewport"></div>
+
+  <!-- HUD HEADER HEADER -->
+  <header class="hud-header">
+    <div class="logo-area">
+      <a href="/" class="logo-link">
+        <i class="fa-solid fa-satellite-dish glow-cyan"></i>
+        <span class="logo-text">EcoREALM</span>
+        <span class="logo-tag">RESTORATION COMMAND OS</span>
+      </a>
+    </div>
+    <div class="header-status">
+      <span class="pulse-indicator warning"></span>
+      <span class="status-message">SECURE SATELLITE DATALINK: LEVEL 1 BIOSPHERE THREAT</span>
+    </div>
+  </header>
+
+  <!-- HUD SIDE PANEL - LEFT (Environmental Stats) -->
+  <aside class="hud-panel left-panel glass-panel">
+    <div class="panel-header">
+      <i class="fa-solid fa-gauge-high"></i> Global Health Indicator
+    </div>
+    <div class="panel-body">
+      <div class="health-indicator-ring">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" class="ring-bg"></circle>
+          <circle cx="50" cy="50" r="40" class="ring-fill danger" style="stroke-dasharray: 251.2; stroke-dashoffset: 170.8;"></circle>
+        </svg>
+        <div class="ring-label">
+          <span class="value text-red">32%</span>
+          <span class="desc">BIOME INTEGRITY</span>
+        </div>
+      </div>
+      
+      <div class="stat-list">
+        <div class="stat-item">
+          <span class="label">CURRENT PLANET STATUS</span>
+          <span class="value text-red">CRITICAL ACCELERATION</span>
+        </div>
+        <div class="stat-item">
+          <span class="label">ATMOSPHERIC TEMP FLUX</span>
+          <span class="value text-red">+1.48°C</span>
+        </div>
+        <div class="stat-item">
+          <span class="label">DEFORESTATION RATE</span>
+          <span class="value text-red">10M HECTARES/YR</span>
+        </div>
+        <div class="stat-item">
+          <span class="label">DESERTIFICATION SPEED</span>
+          <span class="value text-red">23,000 SQ MI/YR</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER CONSOLE - REGISTRATION FORM -->
+  <main class="hud-center-console">
+    <div class="registration-hud-card glass-panel" id="registration-form-card">
+      <div class="hud-card-corners"></div>
+      
+      <div class="console-header">
+        <h1 class="console-title">Join the Restoration</h1>
+        <p class="console-subtitle">Your first step toward healing the planet.</p>
+      </div>
+
+      <div class="error-banner" id="error-banner" style="display: none;">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span id="error-text">DEVIATION DETECTED</span>
+      </div>
+
+      <form id="register-form" autocomplete="off">
+        <div class="form-grid">
+          <div class="input-hud-group">
+            <label for="username"><i class="fa-solid fa-user-shield"></i> Guardian Callsign / Name</label>
+            <input type="text" id="username" name="username" class="hud-input" placeholder="e.g. Commander Eco" required>
+            <span class="input-line-glow"></span>
+          </div>
+
+          <div class="input-hud-group">
+            <label for="email"><i class="fa-solid fa-envelope"></i> Core Comms Email</label>
+            <input type="email" id="email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org" required>
+            <span class="input-line-glow"></span>
+          </div>
+
+          <div class="input-hud-group">
+            <label for="password"><i class="fa-solid fa-lock"></i> Command Decryption Key (Password)</label>
+            <input type="password" id="password" name="password" class="hud-input" placeholder="Minimum 6 characters" required>
+            <span class="input-line-glow"></span>
+          </div>
+
+          <div class="input-hud-group">
+            <label for="confirmPassword"><i class="fa-solid fa-shield-halved"></i> Verify Decryption Key</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="hud-input" placeholder="Confirm password" required>
+            <span class="input-line-glow"></span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-hud-action primary-btn" id="submit-btn">
+          <span class="btn-glow-layer"></span>
+          <span class="btn-text"><i class="fa-solid fa-rocket"></i> Initiate Mission (Sign Up)</span>
+        </button>
+
+        <div class="divider">
+          <span>SECURE EXTERNAL CREDENTIAL LINK</span>
+        </div>
+
+        <button type="button" class="btn-hud-action secondary-btn" onclick="googleOAuth()">
+          <span class="btn-text"><i class="fa-brands fa-google"></i> Continue with Google Link</span>
+        </button>
+      </form>
+
+      <div class="console-footer">
+        <span>Already verified on the mainframe? <a href="/login" class="link-cyan">Synchronize Neural Profile</a></span>
+      </div>
+    </div>
+  </main>
+
+  <!-- HUD SIDE PANEL - RIGHT (Ecosystem Health) -->
+  <aside class="hud-panel right-panel glass-panel">
+    <div class="panel-header">
+      <i class="fa-solid fa-chart-line"></i> Atmospheric Telemetry
+    </div>
+    <div class="panel-body">
+      <div class="telemetry-box warning">
+        <span class="label">LIVE CO₂ LEVEL</span>
+        <span class="value text-red">428.15 PPM</span>
+        <span class="delta"><i class="fa-solid fa-arrow-trend-up"></i> +2.4 PPM/YR</span>
+      </div>
+      
+      <div class="telemetry-box warning">
+        <span class="label">BIODIVERSITY RECOVERY</span>
+        <span class="value text-red">-0.82%</span>
+        <span class="delta"><i class="fa-solid fa-circle-exclamation"></i> SPECIES THREATENED</span>
+      </div>
+
+      <div class="telemetry-box info">
+        <span class="label">GLOBAL RESTORATION PROGRESS</span>
+        <span class="value text-cyan">0.01%</span>
+        <span class="delta"><i class="fa-solid fa-arrow-trend-up"></i> INITIALIZING SECTOR SEED</span>
+      </div>
+
+      <div class="sensor-feed">
+        <span class="sensor-header">ACTIVE ECO-SENSORS ONLINE</span>
+        <div class="sensor-grid">
+          <div class="sensor-dot green">SYS</div>
+          <div class="sensor-dot green">ATM</div>
+          <div class="sensor-dot yellow">BIO</div>
+          <div class="sensor-dot red">HYD</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ================= SUCCESS CINEMATIC OVERLAY ================= -->
+<div class="cinematic-overlay" id="cinematic-overlay">
+  <div class="cinematic-grid"></div>
+  <div class="forest-silhouette"></div>
+  <div class="birds-container" id="birds-container"></div>
+  
+  <div class="cinematic-content">
+    <div class="welcome-box">
+      <h2 class="welcome-title">WELCOME GUARDIAN</h2>
+      <p class="welcome-subtitle">NEURAL LINK SUCCESSFUL // BIOSPHERE ENGINE ENGAGED</p>
+      
+      <div class="terminal-loader">
+        <div class="loader-line" id="loader-line"></div>
+      </div>
+      <p class="loader-log" id="cinematic-log">> DEPLOYING REGIONAL CONSERVATION MATRIX...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  let scene, camera, renderer, globe, particles;
+  let successMode = false;
+  
+  function initThree() {
+    const container = document.getElementById('hologram-viewport');
+    if (!container) return;
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 18;
+
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // Create Holographic Globe (Dead State)
+    const geometry = new THREE.IcosahedronGeometry(5, 2);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x4a525d, // Dull grey/blue
+      wireframe: true,
+      transparent: true,
+      opacity: 0.3
+    });
+    globe = new THREE.Mesh(geometry, material);
+    scene.add(globe);
+
+    // Add Red Warning Flags (Spheres at random vertices)
+    const positions = geometry.attributes.position;
+    const warningGeo = new THREE.SphereGeometry(0.12, 8, 8);
+    const warningMat = new THREE.MeshBasicMaterial({ color: 0xff3366, transparent: true, opacity: 0.8 });
+    
+    // Deploy 8 warning markers
+    for(let i = 0; i < 8; i++) {
+      const index = Math.floor(Math.random() * (positions.count));
+      const x = positions.getX(index);
+      const y = positions.getY(index);
+      const z = positions.getZ(index);
+      
+      const marker = new THREE.Mesh(warningGeo, warningMat);
+      marker.position.set(x, y, z);
+      globe.add(marker);
+    }
+
+    // Add Warning Particle Cloud
+    const particleCount = 200;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      // Sphere coordinate generation
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = 5.2 + Math.random() * 2.0;
+
+      particlePositions[i] = r * Math.sin(phi) * Math.cos(theta);
+      particlePositions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+      particlePositions[i + 2] = r * Math.cos(phi);
+
+      // Warning color (Red/Orange-grey)
+      colors[i] = 0.9;     // R
+      colors[i + 1] = 0.2; // G
+      colors[i + 2] = 0.3; // B
+    }
+
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Custom points material
+    const particleMat = new THREE.PointsMaterial({
+      size: 0.08,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.7
+    });
+
+    particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      globe.rotation.y += 0.002;
+      globe.rotation.x += 0.001;
+      
+      particles.rotation.y -= 0.001;
+      
+      // Dynamic scaling on hover
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Mouse movement response
+    document.addEventListener('mousemove', (e) => {
+      if (successMode) return;
+      const mouseX = (e.clientX / window.innerWidth) - 0.5;
+      const mouseY = (e.clientY / window.innerHeight) - 0.5;
+      gsap.to(globe.rotation, { y: mouseX * 2, x: mouseY * 2, duration: 2 });
+    });
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  }
+
+  // Trigger Green Environment Transformation
+  function triggerTransformation() {
+    successMode = true;
+    
+    // Shift globe wireframe color to neon green
+    gsap.to(globe.material.color, { r: 0.36, g: 1.0, b: 0.7, duration: 2 });
+    gsap.to(globe.material, { opacity: 0.8, duration: 2 });
+
+    // Morph the warning dots into bright green nodes
+    globe.children.forEach(marker => {
+      gsap.to(marker.material.color, { r: 0.36, g: 1.0, b: 0.7, duration: 1.5 });
+      gsap.to(marker.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 2 });
+    });
+
+    // Change background particles to green
+    const colors = particles.geometry.attributes.color.array;
+    for(let i = 0; i < colors.length; i += 3) {
+      gsap.to(colors, { [i]: 0.36, [i+1]: 1.0, [i+2]: 0.7, duration: 2, onUpdate: () => {
+        particles.geometry.attributes.color.needsUpdate = true;
+      }});
+    }
+
+    // Zoom globe closer
+    gsap.to(camera.position, { z: 10, duration: 3, ease: "power2.out" });
+  }
+
+  // Create SVGs of flying birds
+  function spawnBirds() {
+    const container = document.getElementById('birds-container');
+    for (let i = 0; i < 15; i++) {
+      const bird = document.createElement('div');
+      bird.className = 'bird-element';
+      bird.innerHTML = `<svg viewBox="0 0 100 100" width="40"><path d="M10,50 Q30,20 50,50 Q70,20 90,50 Q70,35 50,55 Q30,35 10,50 Z" fill="#5CFFB3" opacity="0.8"/></svg>`;
+      bird.style.position = 'absolute';
+      bird.style.left = `-50px`;
+      bird.style.top = `${20 + Math.random() * 50}%`;
+      bird.style.transform = `scale(${0.3 + Math.random() * 0.7})`;
+      container.appendChild(bird);
+
+      gsap.to(bird, {
+        x: window.innerWidth + 100,
+        y: `-=${50 + Math.random() * 150}`,
+        duration: 3 + Math.random() * 2,
+        delay: Math.random() * 1.5,
+        ease: "power1.out"
+      });
+    }
+  }
+
+  function googleOAuth() {
+    alert("Establishing Google Authentication Link... (Simulated)");
+  }
+
+  // Submit Handler
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    const errorBanner = document.getElementById('error-banner');
+    const errorText = document.getElementById('error-text');
+
+    if (password !== confirmPassword) {
+      errorText.textContent = "DECRYPTION KEYS DO NOT MATCH. RETRY.";
+      errorBanner.style.display = 'block';
+      return;
+    }
+
+    errorBanner.style.display = 'none';
+
+    // Disable button & show scanning loader
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> TRANSMITTING CREDENTIALS...`;
+
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Mission authorization failed.");
+      }
+
+      // SUCCESS FLOW
+      triggerTransformation();
+      
+      // Animate form card fade-out
+      gsap.to('#registration-form-card, .hud-panel', {
+        opacity: 0,
+        y: -30,
+        duration: 1,
+        onComplete: () => {
+          document.getElementById('registration-form-card').style.display = 'none';
+        }
+      });
+
+      // Show Cinematic Overlay
+      setTimeout(() => {
+        const cinematic = document.getElementById('cinematic-overlay');
+        cinematic.classList.add('active');
+        spawnBirds();
+        
+        // Loader line animation
+        gsap.to('#loader-line', { width: '100%', duration: 3, ease: 'power1.inOut' });
+
+        // Print cinematic console lines
+        const logs = [
+          "> BOOTING ECO-RESTORATION ENGINE...",
+          "> CULTIVATING FOREST GRID SPECIES...",
+          "> LEVEL 1 GUARDIAN ACCESS GRANTED.",
+          "> SYNCHRONIZING DIAGNOSTIC SCAN Core..."
+        ];
+        
+        logs.forEach((log, index) => {
+          setTimeout(() => {
+            document.getElementById('cinematic-log').textContent = log;
+          }, (index + 1) * 800);
+        });
+
+        // Redirect after cinematic
+        setTimeout(() => {
+          window.location.href = '/scan';
+        }, 4000);
+      }, 1200);
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-rocket"></i> Initiate Mission (Sign Up)`;
+      errorText.textContent = `DEVIATION DETECTED: ${err.message.toUpperCase()}`;
+      errorBanner.style.display = 'block';
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initThree();
+  });
+</script>
+
+<%- include('partials/footer') %>

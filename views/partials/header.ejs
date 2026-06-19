@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoRealm 🌍 | Global Restoration Command OS</title>
+  <meta name="description" content="EcoRealm — a futuristic planetary restoration command center. Log eco-habits, deploy green upgrades, and restore the biosphere.">
+  
+  <!-- Google Fonts: Orbitron (HUD titles) + Space Grotesk + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- GSAP for Smooth Transitions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- OrbitControls CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     GLOBAL LOGO NAV — Injected on every single page.
+     Clicking navigates to the Command Center (dashboard home).
+     On the dashboard itself the element is hidden via CSS class
+     (body.page-dashboard) since the HUD header already has the logo.
+     ============================================================ -->
+<a id="global-logo-nav"
+   href="/"
+   title="Return to Command Center"
+   onclick="logoNavClick(event)">
+  <div class="global-logo-icon">
+    <i class="fa-solid fa-satellite-dish"></i>
+  </div>
+  <span class="global-logo-wordmark">EcoREALM</span>
+</a>
+
+<!-- Full-screen flash overlay used during logo-nav transitions -->
+<div id="logo-nav-transition"></div>
+
+<script>
+  // ── Page type detection ──────────────────────────────────────
+  // Determines which CSS body class to set so the nav hides/shows correctly.
+  (function detectPage() {
+    const path = window.location.pathname;
+    if (path === '/' || path === '/dashboard') {
+      document.body.classList.add('page-dashboard');
+    } else {
+      document.body.classList.add('page-login');
+    }
+  })();
+
+  // ── Logo navigation handler ──────────────────────────────────
+  function logoNavClick(e) {
+    e.preventDefault();
+    const dest = '/';                        // Always go to dashboard root
+    const isAlreadyDashboard = document.body.classList.contains('page-dashboard');
+
+    // If we're already on the dashboard just switch to the Orbital tab
+    if (isAlreadyDashboard && typeof switchTab === 'function') {
+      switchTab('orbital');
+
+      // Play click sound if available
+      if (typeof playClickSound === 'function') playClickSound();
+      return;
+    }
+
+    // Otherwise: flash-transition then navigate
+    const overlay = document.getElementById('logo-nav-transition');
+    overlay.classList.add('active');
+
+    // Play click sound if synthesizer is available
+    if (typeof playClickSound === 'function') playClickSound();
+
+    setTimeout(() => {
+      window.location.href = dest;
+    }, 380);
+  }
+
+  // ── Reveal logo after boot completes on the login page ───────
+  // login.ejs calls window.signalBootComplete() when the boot
+  // sequence finishes; that adds the class that fades the logo in.
+  window.signalBootComplete = function () {
+    document.body.classList.add('boot-complete');
+  };
+</script>
+

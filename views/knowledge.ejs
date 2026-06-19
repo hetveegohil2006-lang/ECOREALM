@@ -1,0 +1,419 @@
+<%- include('partials/header') %>
+
+<div class="scanline"></div>
+
+<div class="hud-container">
+  
+  <!-- Cyber HUD Header (Directly resembles dashboard header for visual consistency) -->
+  <header class="hud-header">
+    <div class="hud-logo-area" onclick="window.location.href='/'" title="Return to Command Center" style="cursor:pointer;">
+      <div class="hud-logo-icon">
+        <i class="fa-solid fa-satellite-dish"></i>
+      </div>
+      <h1 class="hud-logo-text">EcoREALM</h1>
+      <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 10px;">KNOWLEDGE_CENTER</span>
+    </div>
+
+    <!-- Title Badge -->
+    <div style="font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 2px; color: var(--accent-green); text-transform: uppercase;">
+      <i class="fa-solid fa-graduation-cap"></i> Biosphere Education Core
+    </div>
+
+    <!-- Return Button -->
+    <div class="hud-user-profile">
+      <a href="/" style="text-decoration: none;">
+        <button class="btn-cyber green-theme" style="padding: 6px 16px; font-size: 0.75rem;">
+          <i class="fa-solid fa-arrow-left"></i> Return to Command Center
+        </button>
+      </a>
+    </div>
+  </header>
+
+  <!-- Navigation and Viewer Panel -->
+  <div class="hud-grid" style="height: calc(100vh - 100px); margin-top: 20px;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="hud-sidebar" style="background: rgba(8,12,24,0.65);">
+      <div class="hud-menu-group">
+        <span class="hud-menu-header">Museum Directory</span>
+        
+        <button class="hud-tab-btn active" onclick="switchKnowledgeSection('carbon-core')">
+          <i class="fa-solid fa-cloud-arrow-down"></i> <span>1. Carbon Footprint</span>
+        </button>
+        
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('biosphere-deck')">
+          <i class="fa-solid fa-leaf"></i> <span>2. Why It Matters</span>
+        </button>
+        
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('climate-effects')">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span>3. Climate Effects</span>
+        </button>
+        
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('how-help')">
+          <i class="fa-solid fa-circle-check"></i> <span>4. How Can You Help</span>
+        </button>
+        
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('realm-mission')">
+          <i class="fa-solid fa-satellite"></i> <span>5. EcoREALM Mission</span>
+        </button>
+        
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('facts-hub')">
+          <i class="fa-solid fa-terminal"></i> <span>6. Climate Facts Hub</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="hud-main-frame" id="knowledge-main-frame" style="padding: 0;">
+      
+      <!-- SECTION 1: WHAT IS A CARBON FOOTPRINT -->
+      <section class="hud-viewport-screen active" id="sec-carbon-core">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Carbon Footprint Analysis Matrix</span>
+            <span class="view-title-desc">Understand emissions pathways and visualize personal greenhouse output</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Text Info -->
+          <div class="glass-panel" style="padding: 24px; display:flex; flex-direction:column; gap:16px;">
+            <span class="dossier-label-mini">EMISSIONS VECTORS</span>
+            
+            <div style="display:flex; flex-direction:column; gap:14px; overflow-y:auto; flex:1; max-height:360px; padding-right:5px;">
+              <div class="knowledge-card-detail">
+                <h4 style="color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:5px;"><i class="fa-solid fa-user"></i> Personal Emissions</h4>
+                <p style="font-size:0.82rem; color:var(--text-cyan); line-height:1.5;">Direct emissions from individual activities, clothing shopping, and food habits. Standard individual behavior directly models regional demand.</p>
+              </div>
+              <div class="knowledge-card-detail">
+                <h4 style="color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:5px;"><i class="fa-solid fa-house"></i> Household Emissions</h4>
+                <p style="font-size:0.82rem; color:var(--text-cyan); line-height:1.5;">Emissions arising from electricity consumption, fossil natural gas heating, air conditioning leaks, and structural insulation levels.</p>
+              </div>
+              <div class="knowledge-card-detail">
+                <h4 style="color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:5px;"><i class="fa-solid fa-car"></i> Transportation Emissions</h4>
+                <p style="font-size:0.82rem; color:var(--text-cyan); line-height:1.5;">Emissions originating from burning liquid hydrocarbon fuels (gasoline/diesel) in individual combustion cars and flight fuels in aviation grids.</p>
+              </div>
+              <div class="knowledge-card-detail">
+                <h4 style="color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:5px;"><i class="fa-solid fa-industry"></i> Industrial Emissions</h4>
+                <p style="font-size:0.82rem; color:var(--text-cyan); line-height:1.5;">Heavy-scale emissions from concrete curing, steel smelting, factory chemical processes, and cargo container shipping logistics.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Interactive Particle Simulation -->
+          <div class="glass-panel" style="padding: 20px; display:flex; flex-direction:column; gap:15px;">
+            <span class="dossier-label-mini"><i class="fa-solid fa-wave-square glow-cyan"></i> DYNAMIC EMISSIONS VISUALIZER</span>
+            
+            <div class="sim-canvas-box" style="position:relative; flex:1; min-height:220px; border:1px solid rgba(0,240,255,0.08); border-radius:6px; background:rgba(3,5,12,0.9); overflow:hidden;">
+              <canvas id="carbon-particles-canvas" style="width:100%; height:100%; display:block;"></canvas>
+            </div>
+            
+            <!-- Visualizer Sliders -->
+            <div class="sim-controls-panel" style="display:flex; flex-direction:column; gap:10px;">
+              <div class="slider-group">
+                <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.72rem; color:var(--text-cyan);">
+                  <span>WEEKLY DRIVE RANGE (KM)</span>
+                  <span id="slider-val-drive">120 km</span>
+                </div>
+                <input type="range" id="sim-slider-drive" class="cyber-slider" min="0" max="600" value="120">
+              </div>
+              <div class="slider-group">
+                <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.72rem; color:var(--text-cyan);">
+                  <span>HOUSEHOLD ENERGY GRID LOAD (KWH)</span>
+                  <span id="slider-val-energy">320 kWh</span>
+                </div>
+                <input type="range" id="sim-slider-energy" class="cyber-slider" min="0" max="1000" value="320">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: WHY IS IT IMPORTANT -->
+      <section class="hud-viewport-screen" id="sec-biosphere-deck" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Planetary Resource Degradation Deck</span>
+            <span class="view-title-desc">Examine the direct correlation between carbon concentrations and biosphere collapse</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- SVG Impact Render -->
+          <div class="glass-panel" style="padding: 20px; display:flex; flex-direction:column;">
+            <span class="dossier-label-mini"><i class="fa-solid fa-eye glow-cyan"></i> BIOSPHERE SIMULATION DECK</span>
+            
+            <div class="biosphere-render-box" style="flex:1; min-height:260px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.03); border-radius:6px; overflow:hidden;">
+              <svg width="340" height="240" viewBox="0 0 340 240" id="svg-biosphere-vector">
+                <!-- Sky Background (controlled by js) -->
+                <rect width="340" height="180" fill="#080e22" id="sky-rect" />
+                
+                <!-- Sun / Heat Wave glow -->
+                <circle cx="170" cy="90" r="40" fill="rgba(255,230,0,0.06)" id="sun-glow" />
+                <circle cx="170" cy="90" r="20" fill="#ffe600" id="sun-core" style="opacity:0.2;" />
+                
+                <!-- Mountain Glacier -->
+                <polygon points="20,180 80,60 140,180" fill="#a5f3fc" id="glacier-poly" />
+                <polygon points="50,120 80,60 110,120" fill="#ffffff" id="glacier-snow" />
+                
+                <!-- Forest Canopy -->
+                <path d="M220 180 L235 140 L250 180 Z" fill="#39ff14" id="tree-1" />
+                <path d="M250 180 L265 130 L280 180 Z" fill="#39ff14" id="tree-2" />
+                <path d="M280 180 L295 145 L310 180 Z" fill="#39ff14" id="tree-3" />
+                
+                <!-- Oceanic Region (Bottom) -->
+                <rect y="180" width="340" height="60" fill="#0080ff" id="ocean-water" />
+                
+                <!-- Marine Life (Fish) / Trash elements -->
+                <path d="M50 205 L65 200 L60 210 Z" fill="#a5f3fc" id="fish-1" />
+                <path d="M120 215 L135 210 L130 220 Z" fill="#a5f3fc" id="fish-2" />
+                
+                <!-- Trash vectors (hidden by default) -->
+                <text x="70" y="225" font-size="14" id="trash-item-1" style="opacity:0;">🛢️</text>
+                <text x="180" y="215" font-size="14" id="trash-item-2" style="opacity:0;">🥤</text>
+                <text x="260" y="230" font-size="14" id="trash-item-3" style="opacity:0;">🛢️</text>
+              </svg>
+            </div>
+            
+            <!-- Climate Slider -->
+            <div style="margin-top:15px;">
+              <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.75rem; margin-bottom:6px;">
+                <span style="color:var(--text-cyan);">CLIMATE HEATING INDEX SLIDER:</span>
+                <span id="climate-slider-lbl" style="color:var(--accent-cyan); font-weight:bold;">Net-Zero Balance (+0.0°C)</span>
+              </div>
+              <input type="range" id="climate-impact-slider" class="cyber-slider" min="0" max="100" value="0">
+            </div>
+          </div>
+          
+          <!-- Text Readout -->
+          <div class="glass-panel" style="padding: 24px; display:flex; flex-direction:column; gap:15px;">
+            <span class="dossier-label-mini">IMPACT DECK BRIEF</span>
+            
+            <div style="display:flex; flex-direction:column; gap:12px; overflow-y:auto; flex:1; max-height:300px; font-size:0.82rem; line-height:1.5; color:var(--text-cyan);">
+              <p>
+                <strong><i class="fa-solid fa-temperature-high text-red"></i> Rising Temperatures</strong>: Greenhouse gases trap solar thermal energy in the troposphere. A +2°C increase models complete agricultural instability.
+              </p>
+              <p>
+                <strong><i class="fa-solid fa-icicles text-cyan"></i> Melting Glaciers</strong>: Glaciers reflect solar energy back into space. Depleting ice sheets trigger rising sea levels and absorb more heat in darker waters.
+              </p>
+              <p>
+                <strong><i class="fa-solid fa-tree text-green"></i> Deforestation</strong>: Trees act as active carbon basins. Razing forest belts releases tonnes of stored carbon and triggers biodiversity collapses.
+              </p>
+              <p>
+                <strong><i class="fa-solid fa-droplet text-red"></i> Ocean Acidification</strong>: Oceans absorb 30% of global CO₂. Rising acidity harms marine shells, corals, and coastal biodiversity reefs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: EFFECTS OF CLIMATE CHANGE -->
+      <section class="hud-viewport-screen" id="sec-climate-effects" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Climate Effects Control Room</span>
+            <span class="view-title-desc">Examine telemetry readouts for extreme environmental weather events</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Interactive List -->
+          <div class="glass-panel" style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+            <span class="dossier-label-mini">SELECT EVENT FOR TELEMETRY LINK</span>
+            
+            <div style="display:flex; flex-direction:column; gap:10px; flex:1;">
+              <button class="effect-selector-btn active" onclick="selectClimateEffect('floods')">
+                <i class="fa-solid fa-house-flood-water"></i> <span>Coastal & Flash Flooding</span>
+              </button>
+              <button class="effect-selector-btn" onclick="selectClimateEffect('heatwaves')">
+                <i class="fa-solid fa-temperature-arrow-up"></i> <span>Global Extreme Heatwaves</span>
+              </button>
+              <button class="effect-selector-btn" onclick="selectClimateEffect('droughts')">
+                <i class="fa-solid fa-sun"></i> <span>Soil Desiccation & Droughts</span>
+              </button>
+              <button class="effect-selector-btn" onclick="selectClimateEffect('wildfires')">
+                <i class="fa-solid fa-fire"></i> <span>Arid Forest Wildfires</span>
+              </button>
+              <button class="effect-selector-btn" onclick="selectClimateEffect('sea-level')">
+                <i class="fa-solid fa-water"></i> <span>Thermal Expansion & Sea Level Rise</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Animated Infographic Card -->
+          <div class="glass-panel-green" id="effect-infographic-card" style="padding:24px; display:flex; flex-direction:column; justify-content:space-between; min-height:360px; border-color:rgba(0,240,255,0.15) !important;">
+            <div id="effect-card-content">
+              <span class="dossier-label-mini" style="color:var(--accent-cyan);" id="effect-mini-label">EVENT TYPE: HYDRAULIC ANOMALY</span>
+              <h3 class="cyber-title" style="font-size:1.6rem; text-align:left; margin:10px 0;" id="effect-title">Coastal & Flash Flooding</h3>
+              <p style="font-size:0.85rem; color:var(--text-cyan); line-height:1.6;" id="effect-desc">
+                Warmer air retains more water vapor (approx. 7% per 1°C increase). This increases extreme precipitation events, causing severe flooding in populated coastal basins and erosion.
+              </p>
+            </div>
+            
+            <!-- Animated Graphic Representation Box -->
+            <div class="infographic-animation-viewport" style="position:relative; width:100%; height:120px; border:1px solid rgba(0,240,255,0.06); border-radius:6px; background:rgba(0,0,0,0.3); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+              <div id="infographic-art" style="font-size:3.5rem;">🌊🏚️</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: HOW CAN YOU HELP -->
+      <section class="hud-viewport-screen" id="sec-how-help" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Command Actions Checklist</span>
+            <span class="view-title-desc">Examine and toggle real-world actions to calibrate grid restoration efficiency</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Checklist -->
+          <div class="glass-panel" style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+            <span class="dossier-label-mini">TOGGLE COMPLETED RESTORATION CHECKS</span>
+            
+            <div style="display:grid; grid-template-rows: repeat(6, 1fr); gap:8px;">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(1)">
+                <div class="check-box-indicator" id="help-check-1"></div>
+                <div class="check-details">
+                  <span class="check-label">Optimize Utility Load (LEDs/Standby)</span>
+                  <p class="check-desc-mini">Unplug devices, shut off lights, wash laundry at 30°C.</p>
+                </div>
+              </div>
+              <div class="cyber-check-card" onclick="toggleHelpCheck(2)">
+                <div class="check-box-indicator" id="help-check-2"></div>
+                <div class="check-details">
+                  <span class="check-label">Transit Network Shifting (Public transit/Cycling)</span>
+                  <p class="check-desc-mini">Bypass fossil combustion cars for electric rails, bikes, or walks.</p>
+                </div>
+              </div>
+              <div class="cyber-check-card" onclick="toggleHelpCheck(3)">
+                <div class="check-box-indicator" id="help-check-3"></div>
+                <div class="check-details">
+                  <span class="check-label">Sow Native Flora (Plant Trees/Gardening)</span>
+                  <p class="check-desc-mini">Reforest soil blocks, support local farming plots.</p>
+                </div>
+              </div>
+              <div class="cyber-check-card" onclick="toggleHelpCheck(4)">
+                <div class="check-box-indicator" id="help-check-4"></div>
+                <div class="check-details">
+                  <span class="check-label">Reduce Plastic Packaging Deficits</span>
+                  <p class="check-desc-mini">Bring reusable containers, reject single-use plastic cups.</p>
+                </div>
+              </div>
+              <div class="cyber-check-card" onclick="toggleHelpCheck(5)">
+                <div class="check-box-indicator" id="help-check-5"></div>
+                <div class="check-details">
+                  <span class="check-label">Hydraulic Flow Conservation</span>
+                  <p class="check-desc-mini">Shorten showers, use low-flow fixtures, collect rainwater.</p>
+                </div>
+              </div>
+              <div class="cyber-check-card" onclick="toggleHelpCheck(6)">
+                <div class="check-box-indicator" id="help-check-6"></div>
+                <div class="check-details">
+                  <span class="check-label">Sort Waste and Compost Loops</span>
+                  <p class="check-desc-mini">Separate recyclable elements and compost organic matter.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Restoration Efficiency Gauge -->
+          <div class="glass-panel" style="padding:24px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:20px; text-align:center;">
+            <span class="dossier-label-mini"><i class="fa-solid fa-circle-notch glow-green"></i> SECTOR EFFICIENCY INDEX</span>
+            
+            <div class="radial-restoration-ring" style="position:relative; width:150px; height:150px; border-radius:50%; border:3px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; background:radial-gradient(circle, rgba(57,255,20,0.02) 0%, transparent 80%);">
+              <div class="radial-glow-ring-green" id="restoration-glow" style="position:absolute; width:144px; height:144px; border-radius:50%; border:3px solid transparent; border-top-color:var(--accent-green); filter:drop-shadow(0 0 8px var(--accent-green-glow)); transform:rotate(0deg); transition:transform 0.5s ease;"></div>
+              <div style="font-family:var(--font-display); font-size:2rem; font-weight:800; color:#fff;" id="help-efficiency-lbl">0%</div>
+            </div>
+            
+            <p style="font-size:0.8rem; color:var(--text-cyan); line-height:1.5; max-width:280px;" id="help-feedback-msg">
+              Grid baseline idle. Toggle checkbox actions on the left to calibrate restoration telemetry.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: ECOREALM MISSION -->
+      <section class="hud-viewport-screen" id="sec-realm-mission" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">EcoREALM Command Mandate</span>
+            <span class="view-title-desc">Understand the strategy and technology modeling planetary balance</span>
+          </div>
+        </div>
+        
+        <div class="glass-panel" style="padding:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; text-align:center; min-height:420px; background:rgba(8,12,24,0.9);">
+          <div style="font-size:3rem; color:var(--accent-cyan); text-shadow:0 0 15px var(--accent-cyan-glow);">
+            <i class="fa-solid fa-satellite-dish"></i>
+          </div>
+          
+          <h2 class="cyber-title" style="max-width:700px; font-size:1.8rem; line-height:1.4;">
+            "EcoREALM transforms sustainability education into an interactive gaming experience where every action contributes toward restoring the planet."
+          </h2>
+          
+          <div style="width:100px; height:2px; background:linear-gradient(90deg, transparent, var(--accent-cyan), transparent);"></div>
+          
+          <p style="font-size:0.95rem; color:var(--text-cyan); max-width:600px; line-height:1.6; font-family:var(--font-mono); text-transform:uppercase;">
+            By translating real-world ecological habits into biomass energy resources, commanders can visually witness the revitalization of the biosphere. Command your grid, defend ecosystems, and lead the global restoration initiative.
+          </p>
+        </div>
+      </section>
+
+      <!-- SECTION 6: ENVIRONMENTAL FACTS HUB -->
+      <section class="hud-viewport-screen" id="sec-facts-hub" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Climate telemetry & Fact Hub</span>
+            <span class="view-title-desc">Query direct scientific telemetry logs and ecological facts</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Terminal output -->
+          <div class="glass-panel" style="padding:24px; display:flex; flex-direction:column; gap:15px; flex:1.3;">
+            <span class="dossier-label-mini"><i class="fa-solid fa-terminal glow-cyan"></i> SECURE DATALINK COMPILING FEED</span>
+            
+            <div class="facts-terminal-view" style="flex:1; background:rgba(3,5,12,0.95); border:1px solid rgba(0,240,255,0.1); border-radius:6px; padding:20px; font-family:var(--font-mono); font-size:0.82rem; color:var(--accent-cyan); height:220px; overflow-y:auto; box-sizing:border-box;">
+              <span style="color:var(--text-muted);">[SATLINK-7] WAITING FOR SCIENTIFIC FEED QUERY...</span>
+              <div id="facts-printout-area" style="margin-top:15px; line-height:1.6; white-space:pre-wrap;"></div>
+            </div>
+            
+            <button class="btn-cyber green-theme" style="width:100%;" id="btn-run-query" onclick="triggerTelemetryQuery()">
+              <i class="fa-solid fa-satellite"></i> Execute Telemetry Query
+            </button>
+          </div>
+          
+          <!-- Category Quick Stats -->
+          <div class="glass-panel" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <span class="dossier-label-mini">FACTS MATRIX STATISTICS</span>
+            
+            <div style="display:flex; flex-direction:column; gap:12px; font-size:0.75rem; font-family:var(--font-mono);">
+              <div style="border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-muted);">CO2 PPM INDEX:</span>
+                <span class="text-red" style="font-size:0.95rem; font-weight:bold;">428.4 PPM</span>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-muted);">ANNUAL RISE RANGE:</span>
+                <span class="text-yellow" style="font-size:0.95rem; font-weight:bold;">+2.4 PPM/yr</span>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-muted);">GLACIER MASS LOSS:</span>
+                <span class="text-red" style="font-size:0.95rem; font-weight:bold;">-267 GT/yr</span>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-muted);">RENEWABLE SHARE:</span>
+                <span class="text-green" style="font-size:0.95rem; font-weight:bold;">30.2%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="/js/knowledge.js"></script>
+
+<%- include('partials/footer') %>

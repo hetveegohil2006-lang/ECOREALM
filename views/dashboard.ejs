@@ -1,0 +1,766 @@
+<%- include('partials/header') %>
+
+<div class="scanline"></div>
+
+<div class="hud-container">
+  
+  <!-- Cyber HUD Header -->
+  <header class="hud-header">
+    <div class="hud-logo-area"
+         onclick="switchTab('orbital'); if(typeof playClickSound==='function') playClickSound();"
+         title="Return to Command Center"
+         style="cursor:pointer; transition: filter 0.25s ease;"
+         onmouseenter="this.style.filter='drop-shadow(0 0 10px rgba(0,240,255,0.5))'"
+         onmouseleave="this.style.filter='none'">
+      <div class="hud-logo-icon">
+        <i class="fa-solid fa-satellite-dish"></i>
+      </div>
+      <h1 class="hud-logo-text">EcoREALM</h1>
+      <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); border: 1px solid rgba(0,240,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 10px;">SECTOR_7_ACTIVE</span>
+    </div>
+
+    <!-- Ticker metrics of current session state -->
+    <div class="hud-stats-ticker">
+      <div class="ticker-item" title="Command Level">
+        <i class="fa-solid fa-shield-halved glow-cyan"></i>
+        <span>LVL:</span>
+        <span class="ticker-val" id="level-val"><%= user.level %></span>
+      </div>
+      <div class="ticker-item coin" title="Energy Coins">
+        <i class="fa-solid fa-coins glow-yellow"></i>
+        <span>COINS:</span>
+        <span class="ticker-val" id="coin-val"><%= user.coins %></span>
+      </div>
+      <div class="ticker-item" title="Carbon Offset Telemetry">
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+        <span>CO2:</span>
+        <span class="ticker-val" id="carbon-val"><%= user.carbonOffset.toFixed(1) %></span> kg
+      </div>
+      <div class="ticker-item" title="Water Conserved Telemetry">
+        <i class="fa-solid fa-droplet glow-cyan"></i>
+        <span>H2O:</span>
+        <span class="ticker-val" id="water-val"><%= user.waterSaved.toFixed(0) %></span> L
+      </div>
+      <div class="ticker-item" title="Energy Conserved Telemetry">
+        <i class="fa-solid fa-plug"></i>
+        <span>ENG:</span>
+        <span class="ticker-val" id="energy-val"><%= user.energyConserved.toFixed(1) %></span> kWh
+      </div>
+    </div>
+
+    <!-- User stats details and Actions -->
+    <div class="hud-user-profile">
+      <div class="hud-user-avatar"></div>
+      <div style="text-align: right; display: flex; flex-direction: column;">
+        <span class="hud-user-name" id="hud-username-val"><%= user.username %></span>
+        <span class="hud-user-rank" id="rank-val"><%= user.rank %></span>
+      </div>
+      <a href="/logout">
+        <button class="btn-hud-logout">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </button>
+      </a>
+    </div>
+  </header>
+
+  <!-- Side Navigation & Main terminal Viewport -->
+  <div class="hud-grid">
+    <aside class="hud-sidebar">
+      <div class="hud-menu-group">
+        <span class="hud-menu-header">Simulation Command</span>
+        <button class="hud-tab-btn active" onclick="switchTab('orbital')">
+          <i class="fa-solid fa-cubes"></i> <span>Orbital Sector</span>
+        </button>
+        <button class="hud-tab-btn" onclick="switchTab('worldmap')">
+          <i class="fa-solid fa-map-location-dot"></i> <span>Planetary Map</span>
+        </button>
+        
+        <span class="hud-menu-header" style="margin-top: 15px;">Operations Deck</span>
+        <button class="hud-tab-btn" onclick="switchTab('challenges')">
+          <i class="fa-solid fa-list-check"></i> <span>Missions Deck</span>
+        </button>
+        <button class="hud-tab-btn" onclick="switchTab('carbon')">
+          <i class="fa-solid fa-clipboard-question"></i> <span>Carbon Diagnostic</span>
+        </button>
+        <button class="hud-tab-btn" onclick="switchTab('arcade')">
+          <i class="fa-solid fa-gamepad"></i> <span>Cosmic Arcade</span>
+        </button>
+
+        <span class="hud-menu-header" style="margin-top: 15px;">Mainframe Network</span>
+        <button class="hud-tab-btn" onclick="switchTab('community')">
+          <i class="fa-solid fa-tower-broadcast"></i> <span>Community Link</span>
+        </button>
+        <button class="hud-tab-btn" onclick="switchTab('profile')">
+          <i class="fa-solid fa-id-card-clip"></i> <span>Command Tier</span>
+        </button>
+        <a href="/knowledge" style="text-decoration: none;">
+          <button class="hud-tab-btn" style="width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-graduation-cap"></i> <span>Knowledge Center</span>
+          </button>
+        </a>
+      </div>
+
+      <!-- Footer sound control inside sidebar -->
+      <div class="hud-audio-control">
+        <span class="audio-toggle-lbl"><i class="fa-solid fa-volume-high"></i> SYSTEM SOUNDS</span>
+        <div class="audio-switch active" id="audio-toggle-switch" onclick="toggleAudioSystem()"></div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport screens container -->
+    <main class="hud-main-frame" id="hud-main-frame">
+      
+      <!-- 1. ORBITAL VIEW (3D Simulator) -->
+      <section class="hud-viewport-screen active" id="screen-orbital">
+        <div class="orbital-wrapper">
+          <div class="view-header">
+            <div class="view-title-box">
+              <span class="view-title-main">Restoration Sector 7</span>
+              <span class="view-title-desc">Dynamic 3D Floating Ecosystem Simulation</span>
+            </div>
+            
+            <div class="island-metrics" style="position: relative; top: 0; right: 0; display: flex; flex-direction: row; gap: 15px;">
+              <div class="metric-pill water">
+                <i class="fa-solid fa-droplet glow-cyan"></i> Water Cleanliness: <span id="water-pill-val"><%= user.island.waterCleanliness %></span>%
+              </div>
+              <div class="metric-pill meadow">
+                <i class="fa-solid fa-seedling glow-green"></i> Meadow Health: <span id="meadow-pill-val"><%= user.island.meadowGreenness %></span>%
+              </div>
+            </div>
+          </div>
+          
+          <div class="orbital-canvas-frame">
+            <div class="orbital-hud-gridlines"></div>
+            <div class="orbital-hud-overlay">
+              <div class="orbital-hud-telemetry">> SCANNERS: ON</div>
+              <div class="orbital-hud-telemetry">> ORBITAL RATE: 0.0015 R/s</div>
+              <div class="orbital-hud-telemetry" id="3d-trees-counter">> BIOMASS CORES: <%= user.island.trees %> TREES</div>
+              <div class="orbital-hud-telemetry" id="3d-solar-counter">> SOLAR ARRAY CONNECTIONS: <%= user.island.solarPanels %></div>
+            </div>
+            
+            <canvas id="realm-canvas"></canvas>
+            
+            <div class="canvas-controls-hint">
+              <i class="fa-solid fa-arrows-spin"></i> Rotate: Click & Drag | Zoom: Scroll
+            </div>
+          </div>
+          
+          <!-- Bottom controls bar -->
+          <div class="orbital-controls-bar">
+            <span class="orbital-controls-title"><i class="fa-solid fa-circle-info"></i> Simulation Control Parameters</span>
+            <div class="orbital-btn-switches">
+              <button class="btn-switch-hud active" id="btn-toggle-scanlines" onclick="toggleScanlines()">Scanlines: ON</button>
+              <button class="btn-switch-hud" id="btn-toggle-lighting" onclick="toggleSimulationLighting()">Day/Night: DAY</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PLANETARY WORLD MAP VIEW -->
+      <section class="hud-viewport-screen" id="screen-worldmap">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Tactical Restoration Map</span>
+            <span class="view-title-desc">Click active regions to inspect environmental telemetry</span>
+          </div>
+        </div>
+        
+        <div class="map-frame">
+          <div class="orbital-hud-gridlines"></div>
+          <div class="map-svg-container">
+            <!-- Semi-abstract geographic SVG representing global regions -->
+            <svg viewBox="0 0 1000 500" width="100%" height="100%">
+              <!-- Outline grids -->
+              <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(0,240,255,0.08)" stroke-dasharray="5,5" />
+              <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(0,240,255,0.08)" stroke-dasharray="5,5" />
+              
+              <!-- Industrial Restoration Zone (North America) -->
+              <path class="map-region-node" d="M150 120 L280 120 L280 200 L180 200 Z" id="region-industrial" onclick="selectMapRegion('industrial')" />
+              
+              <!-- Ocean Cleanup Coast (Atlantic/Pacific Coast) -->
+              <path class="map-region-node" d="M300 240 L350 210 L380 280 L330 310 Z" id="region-ocean" onclick="selectMapRegion('ocean')" />
+              
+              <!-- Forest Conservation Zone (Amazon basin) -->
+              <path class="map-region-node" d="M220 280 L290 280 L310 380 L200 360 Z" id="region-forest" onclick="selectMapRegion('forest')" />
+              
+              <!-- Green Energy Zone (Europe/North Africa) -->
+              <path class="map-region-node" d="M480 140 L580 120 L610 200 L510 220 Z" id="region-energy" onclick="selectMapRegion('energy')" />
+              
+              <!-- Wildlife Sanctuary (African Savannah / Asia forests) -->
+              <path class="map-region-node" d="M520 250 L620 240 L650 350 L560 360 Z" id="region-wildlife" onclick="selectMapRegion('wildlife')" />
+              
+              <!-- Net-Zero Future Hub (East Asia/Japan) -->
+              <path class="map-region-node" d="M750 150 L860 140 L880 240 L780 260 Z" id="region-future" onclick="selectMapRegion('future')" />
+              
+              <!-- SVG Labels -->
+              <text x="210" y="160" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">INDUSTRIAL CO-1</text>
+              <text x="250" y="330" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">FOREST CO-2</text>
+              <text x="545" y="170" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">ENERGY CO-3</text>
+              <text x="340" y="260" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">OCEAN CO-4</text>
+              <text x="580" y="300" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">WILDLIFE CO-5</text>
+              <text x="815" y="200" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">NET-ZERO CO-6</text>
+            </svg>
+          </div>
+          
+          <!-- Interactive map slide-out panel -->
+          <div class="map-overlay-intel" id="map-overlay-intel">
+            <div class="intel-info-box">
+              <span class="intel-name" id="intel-region-name">REGION NAME</span>
+              <span class="intel-status" id="intel-region-status">STATUS</span>
+            </div>
+            
+            <div style="font-size: 0.85rem; max-width: 400px; color: var(--text-cyan);" id="intel-region-desc">
+              Select a sector node to run diagnostic analysis.
+            </div>
+            
+            <div class="intel-progress-group">
+              <span class="intel-progress-lbl">RESTORATION:</span>
+              <div class="intel-progress-bar">
+                <div class="intel-progress-fill" id="intel-region-fill"></div>
+              </div>
+              <span class="intel-progress-lbl" style="color: var(--accent-green);" id="intel-region-perc">0%</span>
+            </div>
+            
+            <button class="intel-close-btn" onclick="closeMapRegion()"><i class="fa-solid fa-circle-xmark"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. MISSIONS DECK VIEW -->
+      <section class="hud-viewport-screen" id="screen-challenges">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Tactical Missions</span>
+            <span class="view-title-desc">Log real-world ecological actions to synchronize biomass coins & experience</span>
+          </div>
+        </div>
+        
+        <div class="challenges-grid">
+          <% Object.keys(habits).forEach(function(key) { %>
+            <div class="challenge-card">
+              <div class="challenge-card-header">
+                <span class="challenge-card-title"><%= habits[key].name %></span>
+                <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan); cursor: help;" title="Ecosystem effect: -<%= habits[key].carbon %> kg CO2, +<%= habits[key].water %> L water, +<%= habits[key].energy %> kWh energy saved"></i>
+              </div>
+              
+              <div class="challenge-card-rewards">
+                <div class="challenge-reward-tag xp">
+                  <i class="fa-solid fa-bolt"></i> +<%= habits[key].xp %> XP
+                </div>
+                <div class="challenge-reward-tag coin">
+                  <i class="fa-solid fa-coins"></i> +<%= habits[key].coins %> Coins
+                </div>
+              </div>
+              
+              <button class="btn-challenge-action btn-log" data-habit-id="<%= key %>">
+                <i class="fa-solid fa-plus-circle"></i> Log Mission Action
+              </button>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+
+      <!-- 4. CARBON DIAGNOSTIC VIEW -->
+      <section class="hud-viewport-screen" id="screen-carbon">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Carbon Briefing Assessment</span>
+            <span class="view-title-desc">Conduct scanning analysis of personal consumption patterns</span>
+          </div>
+        </div>
+        
+        <div class="carbon-wizard-box glass-panel">
+          <!-- Step 1: Transport -->
+          <div class="carbon-step-card active" id="carbon-step-1">
+            <span class="carbon-step-title">[DIAGNOSTIC 01/04] Transit Link Analysis</span>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Select your primary transportation method for weekly activities.</p>
+            <div class="carbon-options-list">
+              <button class="carbon-option-btn" onclick="selectCarbonOption(1, 'car', 4.5)">Single Occupant Fossil Fuel Car (-4.5 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(1, 'transit', 1.2)">Public Transit Link (-1.2 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(1, 'active', 0)">Active Commuting (Walk/Bike/EV) (0.0 Optimal)</button>
+            </div>
+          </div>
+          
+          <!-- Step 2: Food -->
+          <div class="carbon-step-card" id="carbon-step-2">
+            <span class="carbon-step-title">[DIAGNOSTIC 02/04] Dietary Energy Load</span>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Specify your regular weekly dietary profile.</p>
+            <div class="carbon-options-list">
+              <button class="carbon-option-btn" onclick="selectCarbonOption(2, 'meat', 3.8)">Heavy Meat and Dairy Reliance (-3.8 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(2, 'mixed', 1.8)">Mixed Diet / Occasional Meatless Days (-1.8 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(2, 'vegan', 0.4)">Plant-Based / Zero Livestock Consumption (-0.4 Optimal)</button>
+            </div>
+          </div>
+          
+          <!-- Step 3: Energy -->
+          <div class="carbon-step-card" id="carbon-step-3">
+            <span class="carbon-step-title">[DIAGNOSTIC 03/04] Household Energy Matrix</span>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">What is the active heating/electricity profile of your shelter?</p>
+            <div class="carbon-options-list">
+              <button class="carbon-option-btn" onclick="selectCarbonOption(3, 'coal', 5.0)">Standard Grid Electricity with Fossil Heating (-5.0 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(3, 'hybrid', 2.2)">Insulated Hybrid Grid / Heat-Pump Retrofit (-2.2 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(3, 'solar', 0.2)">Local Solar Panel Generation / Heat Recovery (-0.2 Optimal)</button>
+            </div>
+          </div>
+          
+          <!-- Step 4: Waste -->
+          <div class="carbon-step-card" id="carbon-step-4">
+            <span class="carbon-step-title">[DIAGNOSTIC 04/04] Material Disposal Loops</span>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">How does your command post process trash recycling?</p>
+            <div class="carbon-options-list">
+              <button class="carbon-option-btn" onclick="selectCarbonOption(4, 'landfill', 2.5)">Everything to Landfill / Minimal Sorting (-2.5 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(4, 'sorting', 0.9)">Standard Recycling Sort / Plastic Bottles (-0.9 Rating)</button>
+              <button class="carbon-option-btn" onclick="selectCarbonOption(4, 'zero', 0.1)">Zero-Waste Loop / Composting (-0.1 Optimal)</button>
+            </div>
+          </div>
+
+          <!-- Step 5: Scoring -->
+          <div class="carbon-step-card" id="carbon-step-5">
+            <span class="carbon-step-title">[DIAGNOSTIC COMPLETED] Mainframe Feedback</span>
+            <div class="carbon-score-display">
+              <div class="carbon-score-ring"><span id="carbon-final-score">15.8</span></div>
+              <p style="font-weight: bold; color: var(--accent-cyan);" id="carbon-grade-label">DIAGNOSTIC: CRITICAL DEGRADATION</p>
+              <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 400px; line-height: 1.5;">
+                Your estimated annual carbon score is <span id="carbon-score-text">15.8</span> metric tonnes. The global target is under 2.0 tonnes. Complete daily challenges to reduce this load and earn command rewards.
+              </p>
+              <button class="btn-cyber green-theme" style="padding: 10px 24px;" onclick="resetCarbonWizard()">
+                <i class="fa-solid fa-arrows-rotate"></i> Recalibrate Core
+              </button>
+            </div>
+          </div>
+
+          <!-- Diagnostic Controls footer -->
+          <div class="carbon-wizard-controls" id="carbon-controls">
+            <button class="btn-switch-hud" onclick="slideCarbonStep(-1)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+            <button class="btn-cyber" id="carbon-next-btn" onclick="slideCarbonStep(1)" style="padding: 6px 16px;">Next Step <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. COSMIC ARCADE VIEW -->
+      <section class="hud-viewport-screen" id="screen-arcade">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Simulation Arcade Hub</span>
+            <span class="view-title-desc">Deploy training simulations to earn bonus energy coins</span>
+          </div>
+        </div>
+        
+        <div class="arcade-grid">
+          <!-- Game 1 -->
+          <div class="arcade-card" onclick="launchGame('recycling')">
+            <div class="arcade-card-info">
+              <div class="arcade-icon"><i class="fa-solid fa-recycle"></i></div>
+              <h3 class="arcade-title">Recycling Rush</h3>
+              <p class="arcade-desc">Catch sorting material (Plastic, Metal, Paper) in the proper containers. Avoid falling hazard waste core batteries!</p>
+            </div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 30 Coins</div>
+          </div>
+
+          <!-- Game 2 -->
+          <div class="arcade-card" onclick="launchGame('quiz')">
+            <div class="arcade-card-info">
+              <div class="arcade-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <h3 class="arcade-title">Eco Quiz</h3>
+              <p class="arcade-desc">Test your climatic sciences comprehension. Answer restoration questions to earn rewards.</p>
+            </div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 25 Coins</div>
+          </div>
+
+          <!-- Game 3 -->
+          <div class="arcade-card" onclick="launchGame('grid')">
+            <div class="arcade-card-info">
+              <div class="arcade-icon"><i class="fa-solid fa-circle-nodes"></i></div>
+              <h3 class="arcade-title">Energy Grid Puzzle</h3>
+              <p class="arcade-desc">Align rotating kinetic and solar cables. Route renewable electricity generator modules to power the city nodes.</p>
+            </div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 35 Coins</div>
+          </div>
+
+          <!-- Game 4 -->
+          <div class="arcade-card" onclick="launchGame('ocean')">
+            <div class="arcade-card-info">
+              <div class="arcade-icon"><i class="fa-solid fa-droplet"></i></div>
+              <h3 class="arcade-title">Ocean Cleanup</h3>
+              <p class="arcade-desc">Clean marine waste. Double-click floating plastic garbage objects in coastal waters before the timer runs out!</p>
+            </div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 30 Coins</div>
+          </div>
+
+          <!-- Game 5 -->
+          <div class="arcade-card" onclick="launchGame('tree')">
+            <div class="arcade-card-info">
+              <div class="arcade-icon"><i class="fa-solid fa-seedling"></i></div>
+              <h3 class="arcade-title">Tree Simulator</h3>
+              <p class="arcade-desc">Cultivate a digital seedling. Coordinate dig, seeding, watering, and solar light loops to grow a mature pine.</p>
+            </div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 20 Coins</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. COMMUNITY & LEADERBOARD VIEW -->
+      <section class="hud-viewport-screen" id="screen-community">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Command Mainframe Network</span>
+            <span class="view-title-desc">Monitor global community metrics and check top ranks</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Left side: Community logs -->
+          <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+            <span class="hud-panel-title"><i class="fa-solid fa-tower-broadcast glow-cyan"></i> Live Telemetry Feed</span>
+            <div class="community-feed-box" id="community-feed">
+              <div class="feed-item"><span class="feed-timestamp">14:52</span> Commander Solar deployed [Micro Solar Array] to Sector 3</div>
+              <div class="feed-item alert"><span class="feed-timestamp">14:50</span> Commander Leafy completed mission [Commute Green]! (+50 XP)</div>
+              <div class="feed-item"><span class="feed-timestamp">14:48</span> Community Event: Global Carbon Offset reached 12,000 kg!</div>
+              <div class="feed-item"><span class="feed-timestamp">14:42</span> Commander Aqua purchased [Water Filtration Unit] (+15% Cleanliness)</div>
+              <div class="feed-item"><span class="feed-timestamp">14:35</span> Commander Eco logged challenge [Meatless Day] (+20 Coins)</div>
+            </div>
+            
+            <div class="stats-widget" style="margin-top: auto;">
+              <div class="stats-header">Global Ecosystem Balance</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-green); font-family: var(--font-display);">
+                <i class="fa-solid fa-earth-americas"></i> 34,892,109 <span style="font-size: 0.8rem; color: var(--text-muted);">TOTAL CO2 OFFSET (KG)</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right side: Leaderboards -->
+          <div class="glass-panel" style="padding: 20px;">
+            <span class="hud-panel-title"><i class="fa-solid fa-trophy glow-yellow"></i> Leaderboard Ranks</span>
+            
+            <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+              <button class="btn-switch-hud active" style="flex: 1; padding: 4px;" onclick="toggleLeaderboardType('global')">Global</button>
+              <button class="btn-switch-hud" style="flex: 1; padding: 4px;" onclick="toggleLeaderboardType('friends')">Friends</button>
+            </div>
+            
+            <div id="leaderboard-table-container" style="max-height: 250px; overflow-y: auto;">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Commander</th>
+                    <th>Level</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <!-- Injected by script -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. COMMAND TIER (RPG Profile) -->
+      <section class="hud-viewport-screen" id="screen-profile">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Command Tier Progression</span>
+            <span class="view-title-desc">Evolving Guardian Avatar, Badge Matrix, Trophy Achievements & Command Shop</span>
+          </div>
+        </div>
+        
+        <div class="view-split-grid">
+          <!-- Left side: Evolving Character Profile card -->
+          <div class="profile-main-card glass-panel" style="flex: 1.1; justify-content: flex-start; padding: 25px; min-height: 480px;">
+            <span class="dossier-label-mini">ACTIVE COMMANDER AVATAR</span>
+            
+            <!-- SVG Evolving Avatar Container -->
+            <div class="profile-avatar-display-premium" id="avatar-svg-container" style="position: relative; margin: 15px auto; width: 140px; height: 140px;">
+              <!-- Rendered dynamically by script -->
+            </div>
+            
+            <span class="profile-username" id="profile-username-lbl"><%= user.username %></span>
+            
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 5px; width: 100%;">
+              <span class="profile-rank-badge" id="profile-rank-lbl" style="font-size: 0.95rem; letter-spacing: 1px;"><%= user.rank %></span>
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; display: inline-block;" id="profile-custom-title-display">COMMAND CORE</span>
+            </div>
+            
+            <!-- XP Progress -->
+            <div style="width: 100%; margin-top: 20px;">
+              <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-cyan); margin-bottom: 6px;">
+                <span>BIOMASS LEVEL PROGRESS:</span>
+                <span><span id="xp-val"><%= user.xp % 100 %></span> / 100 XP</span>
+              </div>
+              <div class="xp-bar-outer" style="height: 10px; margin-top: 0;">
+                <div class="xp-bar-inner" id="xp-bar"></div>
+              </div>
+            </div>
+            
+            <!-- Telemetry Stats Summary -->
+            <div class="profile-stats-grid" style="margin-top: 20px; width: 100%;">
+              <div class="profile-stat-box">
+                <span class="profile-stat-val glow-cyan" id="profile-stat-coins"><%= user.coins %></span>
+                <span class="profile-stat-lbl">Eco Points</span>
+              </div>
+              <div class="profile-stat-box">
+                <span class="profile-stat-val glow-green" id="profile-stat-level"><%= user.level %></span>
+                <span class="profile-stat-lbl">Command Level</span>
+              </div>
+            </div>
+            
+            <!-- Restoration Impact Summary -->
+            <div class="glass-panel" style="width: 100%; margin-top: 20px; padding: 12px; background: rgba(0,0,0,0.25); border-color: rgba(255,255,255,0.04);">
+              <span class="dossier-label-mini" style="margin-bottom: 8px; font-size: 0.62rem; color: var(--accent-cyan); text-align: left;"><i class="fa-solid fa-earth-americas"></i> RESTORATION IMPACT REPORT</span>
+              <div style="font-family: var(--font-mono); font-size: 0.75rem; display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <div style="display:flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">CO2 Offset:</span>
+                  <span style="color: #fff;"><span id="profile-impact-carbon"><%= user.carbonOffset.toFixed(1) %></span> kg</span>
+                </div>
+                <div style="display:flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Water Saved:</span>
+                  <span style="color: #fff;"><span id="profile-impact-water"><%= user.waterSaved.toFixed(0) %></span> L</span>
+                </div>
+                <div style="display:flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Energy Saved:</span>
+                  <span style="color: #fff;"><span id="profile-impact-energy"><%= user.energyConserved.toFixed(1) %></span> kWh</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right side: Badges Matrix & Achievements Trophy Gallery -->
+          <div style="display: flex; flex-direction: column; gap: 20px; flex: 1.3;">
+            
+            <!-- Badges Matrix -->
+            <div class="glass-panel" style="padding: 20px;">
+              <span class="hud-panel-title" style="margin-bottom: 12px;"><i class="fa-solid fa-award glow-cyan"></i> Guardian Badge Matrix</span>
+              <div class="badges-grid-premium" id="badges-grid">
+                <!-- Circular slot items -->
+                <div class="badge-premium-slot" id="badge-recycling-hero" title="Unlock: Sort & Recycle waste 3 times">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-recycle"></i></div>
+                  <span class="badge-title-lbl">Recycling Hero</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-water-warrior" title="Unlock: Save > 100L of water">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-droplet"></i></div>
+                  <span class="badge-title-lbl">Water Warrior</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-energy-saver" title="Unlock: Save > 15 kWh of energy">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-bolt"></i></div>
+                  <span class="badge-title-lbl">Energy Saver</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-green-traveler" title="Unlock: Log Commute Green 5 times">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-car-side"></i></div>
+                  <span class="badge-title-lbl">Green Traveler</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-tree-guardian" title="Unlock: Deployed simulator trees >= 3">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-tree"></i></div>
+                  <span class="badge-title-lbl">Tree Guardian</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-ocean-protector" title="Unlock: Earn coins from Ocean Cleanup game">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-fish"></i></div>
+                  <span class="badge-title-lbl">Ocean Protector</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-wildlife-defender" title="Unlock: Deployed Wildlife sanctuary upgrades">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-paw"></i></div>
+                  <span class="badge-title-lbl">Wildlife Defender</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-climate-champion" title="Unlock: Carbon Offset >= 20 kg">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                  <span class="badge-title-lbl">Climate Champion</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-sustainability-master" title="Unlock: Completed Carbon scanner wizard with score < 6.0">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-globe"></i></div>
+                  <span class="badge-title-lbl">Sustainability Master</span>
+                </div>
+                <div class="badge-premium-slot" id="badge-planet-savior" title="Unlock: Reach Command level 50">
+                  <div class="badge-glow-ring"></div>
+                  <div class="badge-icon-core"><i class="fa-solid fa-star-of-life"></i></div>
+                  <span class="badge-title-lbl">Planet Savior</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Achievements Trophy Gallery -->
+            <div class="glass-panel" style="padding: 20px;">
+              <span class="hud-panel-title" style="margin-bottom: 12px;"><i class="fa-solid fa-trophy glow-yellow"></i> Milestones Trophy Gallery</span>
+              <div class="trophy-gallery-grid">
+                
+                <div class="trophy-item-premium" id="trophy-first-mission">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">First Restoration Step</span>
+                    <p class="trophy-desc-lbl">Logged your first daily eco-mission action.</p>
+                  </div>
+                </div>
+                
+                <div class="trophy-item-premium" id="trophy-carbon-100">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">Carbon Crusher Core</span>
+                    <p class="trophy-desc-lbl">Offset more than 50kg CO₂ of atmospheric density.</p>
+                  </div>
+                </div>
+                
+                <div class="trophy-item-premium" id="trophy-plant-50">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">Arbor Canopy Architect</span>
+                    <p class="trophy-desc-lbl">Deployed virtual trees >= 10 on your sector island.</p>
+                  </div>
+                </div>
+                
+                <div class="trophy-item-premium" id="trophy-missions-30">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">Ecosystem Combat Veteran</span>
+                    <p class="trophy-desc-lbl">Completed 10 logged missions in the history registry.</p>
+                  </div>
+                </div>
+                
+                <div class="trophy-item-premium" id="trophy-top-100">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">Command Elite Vanguard</span>
+                    <p class="trophy-desc-lbl">Reached Command level 10 to establish global ranking.</p>
+                  </div>
+                </div>
+                
+                <div class="trophy-item-premium" id="trophy-sector-6">
+                  <div class="trophy-cup-core"><i class="fa-solid fa-trophy"></i></div>
+                  <div class="trophy-details">
+                    <span class="trophy-name-lbl">Net-Zero Hub Sync Link</span>
+                    <p class="trophy-desc-lbl">Unlocked Future Sector 6 Communication Link Access.</p>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Rewards Deck & Command Shop -->
+        <div class="glass-panel" style="margin-top: 20px; padding: 20px;">
+          <span class="hud-panel-title" style="margin-bottom: 12px; color: var(--accent-green);"><i class="fa-solid fa-store"></i> Command Deck RPG Rewards Shop</span>
+          
+          <div class="rewards-shop-grid">
+            
+            <div class="shop-card-premium">
+              <div class="shop-icon"><i class="fa-solid fa-circle-nodes"></i></div>
+              <div class="shop-details">
+                <span class="shop-item-title">XP Quantum Booster</span>
+                <p class="shop-item-desc">Instantly acquire +100 Command Experience Points to accelerate Rank level-ups.</p>
+              </div>
+              <button class="btn-cyber green-theme shop-buy-btn" onclick="buyXPBooster()">
+                <i class="fa-solid fa-coins"></i> 50 Coins
+              </button>
+            </div>
+            
+            <div class="shop-card-premium">
+              <div class="shop-icon"><i class="fa-solid fa-key"></i></div>
+              <div class="shop-details">
+                <span class="shop-item-title">Sector 6 Decrypt Key</span>
+                <p class="shop-item-desc">Establish secure satellite communications with the Net-Zero Future Hub region.</p>
+              </div>
+              <button class="btn-cyber green-theme shop-buy-btn" id="shop-buy-region-btn" onclick="unlockSector6()">
+                <i class="fa-solid fa-coins"></i> 150 Coins
+              </button>
+            </div>
+            
+            <div class="shop-card-premium">
+              <div class="shop-icon"><i class="fa-solid fa-heading"></i></div>
+              <div class="shop-details">
+                <span class="shop-item-title">Command Rank Customizer</span>
+                <p class="shop-item-desc">Equip a specialized, high-tier prefix rank title displayed on the global HUD.</p>
+                <div style="margin-top: 5px;">
+                  <select id="custom-title-select" class="cyber-select" style="font-size: 0.72rem; padding: 3px;">
+                    <option value="Solar Sentinel">Solar Sentinel</option>
+                    <option value="H2O Vanguard">H2O Vanguard</option>
+                    <option value="Biomass Overlord">Biomass Overlord</option>
+                    <option value="Net-Zero Ranger">Net-Zero Ranger</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn-cyber green-theme shop-buy-btn" onclick="buyCustomTitle()">
+                <i class="fa-solid fa-coins"></i> 40 Coins
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- GAME MODAL OVERLAY -->
+<div class="game-overlay-modal" id="game-modal">
+  <div class="game-window-frame" id="game-window-frame">
+    <div class="game-window-header">
+      <span class="game-window-title" id="game-modal-title">GAME SIMULATION</span>
+      <button class="game-close-btn" onclick="closeActiveGame()"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+    </div>
+    
+    <!-- Game Container Body -->
+    <div class="game-window-body" id="game-modal-body">
+      <!-- Injected dynamically by game scripts -->
+    </div>
+  </div>
+</div>
+
+<!-- Level Up Overlay Toast -->
+<div class="level-up-toast" id="level-up-toast">
+  <i class="fa-solid fa-certificate" style="font-size: 1.5rem; animation: spin 4s linear infinite;"></i>
+  <span>COMMAND TIER INCREASED! LEVEL <strong id="toast-level-val">1</strong> ACTIVE</span>
+</div>
+
+<!-- Avatar Evolution Cutscene overlay modal -->
+<div class="evolution-cutscene-overlay" id="evolution-cutscene" style="display: none; opacity: 0;">
+  <div class="evolution-matrix-box">
+    <div class="evolution-laser-sweep"></div>
+    <h1 class="evolution-alert-title"><i class="fa-solid fa-circle-exclamation text-yellow"></i> EVOLUTION LINK DETECTED</h1>
+    <p class="evolution-subtitle">COMMANDER INTEGRATION SYSTEM PROTOCOL</p>
+    
+    <div class="evolution-avatar-morph">
+      <div class="morph-side previous-avatar" id="cutscene-prev-avatar">
+        <!-- SVG Injected -->
+      </div>
+      <div class="morph-arrow"><i class="fa-solid fa-angles-right"></i></div>
+      <div class="morph-side new-avatar" id="cutscene-new-avatar">
+        <!-- SVG Injected -->
+      </div>
+    </div>
+    
+    <h2 class="evolution-rank-unlocked" id="cutscene-rank-lbl">SPROUT KEEPER</h2>
+    <p class="evolution-congrats">Your planetary restoration index has evolved your command state capability!</p>
+    
+    <button class="btn-cyber green-theme" onclick="closeEvolutionCutscene()" style="padding: 10px 28px;">
+      <i class="fa-solid fa-circle-check"></i> Acknowledge Profile Evolve
+    </button>
+  </div>
+</div>
+
+<!-- Inject Initial User State for Scripts -->
+<script>
+  window.initialIslandData = <%- JSON.stringify(user.island) %>;
+  window.initialXP = <%= user.xp %>;
+  window.initialLevel = <%= user.level %>;
+  window.initialCoins = <%= user.coins %>;
+  window.initialCarbon = <%= user.carbonOffset %>;
+  window.initialWater = <%= user.waterSaved %>;
+  window.initialEnergy = <%= user.energyConserved %>;
+  window.netZeroUnlocked = <%= user.netZeroUnlocked %>;
+  window.customTitleBought = <%= user.customTitleBought %>;
+</script>
+
+<script src="/js/realm-3d.js"></script>
+<script src="/js/dashboard.js"></script>
+
+<%- include('partials/footer') %>

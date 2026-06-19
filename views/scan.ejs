@@ -1,0 +1,296 @@
+<%- include('partials/header') %>
+
+<div class="scanline"></div>
+<div class="laser-sweep" id="laser-sweep" style="display: none;"></div>
+
+<div class="scan-wrapper">
+  
+  <!-- Left Side: Interactive Scanner Terminal -->
+  <div class="scan-main-container glass-panel">
+    
+    <!-- PHASE 1: BRIEFING INITIALIZATION -->
+    <div class="scan-phase active" id="phase-briefing">
+      <div class="scan-header">
+        <i class="fa-solid fa-satellite-dish glow-cyan"></i>
+        <span>RESTORE-OS SECURE LINK: GUARDIAN ONBOARDING</span>
+      </div>
+      
+      <div class="briefing-box">
+        <h2 class="cyber-title">INITIALIZE DIAGNOSTIC SCAN</h2>
+        <p class="narrative-text">
+          "Welcome Guardian. Before entering EcoREALM, your environmental impact profile must be analyzed."
+        </p>
+        
+        <div class="narrative-alert">
+          <i class="fa-solid fa-circle-exclamation text-yellow"></i>
+          <span>PROTOCOL WARNING: Biosphere sector synchronization requires an calibrated baseline configuration. Do not bypass link telemetry.</span>
+        </div>
+        
+        <button class="btn-cyber" id="btn-start-scan" onclick="startDiagnostic()">
+          <i class="fa-solid fa-power-off"></i> Establish Telemetry Link
+        </button>
+      </div>
+    </div>
+    
+    <!-- PHASE 2: ASSESSMENT QUESTIONS -->
+    <div class="scan-phase" id="phase-questions" style="display: none; opacity: 0;">
+      <div class="scan-header">
+        <i class="fa-solid fa-network-wired glow-cyan"></i>
+        <span id="question-steps-indicator">DIAGNOSTIC PROTOCOL: CATEGORY 1/6</span>
+      </div>
+      
+      <!-- Progress mini-ticks -->
+      <div class="mini-ticks-bar">
+        <div class="tick active" id="tick-1"></div>
+        <div class="tick" id="tick-2"></div>
+        <div class="tick" id="tick-3"></div>
+        <div class="tick" id="tick-4"></div>
+        <div class="tick" id="tick-5"></div>
+        <div class="tick" id="tick-6"></div>
+      </div>
+      
+      <!-- Question Cards Container -->
+      <div class="question-container">
+        <!-- Q1: Transportation -->
+        <div class="question-card active" id="q-1">
+          <h3 class="q-title"><i class="fa-solid fa-car glow-cyan"></i> Transit Matrix Selection</h3>
+          <p class="q-desc">How do you primarily commute to school, work, or social zones weekly?</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(1, 'heavy', 5.5, 'Requires 5.5 metric tonnes of fossil fuels annually.')">
+              <span class="opt-label">A. Single Occupant Combustion Vehicle</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(1, 'medium', 1.8, 'Standard shared rail or bus network load.')">
+              <span class="opt-label">B. Public Commuter Transit Systems</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(1, 'green', 0.2, 'Zero tailpipe emissions Commute.')">
+              <span class="opt-label">C. Active Transmit / EV Rail (Bike/Walk/Electric)</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Q2: Energy Usage -->
+        <div class="question-card" id="q-2" style="display: none; opacity: 0;">
+          <h3 class="q-title"><i class="fa-solid fa-bolt glow-cyan"></i> Household Energy Matrix</h3>
+          <p class="q-desc">What is the primary source of heating and electricity powering your shelter?</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(2, 'heavy', 4.8, 'Coal/Gas grid dependence.')">
+              <span class="opt-label">A. Fossil-Fuel Sourced National Grid</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(2, 'medium', 2.0, 'Partial insulation and smart thermostats.')">
+              <span class="opt-label">B. Hybrid Grid with Moderate Efficiency Retrofits</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(2, 'green', 0.3, 'Micro-generator solar & geothermal array.')">
+              <span class="opt-label">C. Net-Zero Solar Array / Renewable Grid Provider</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Q3: Food Habits -->
+        <div class="question-card" id="q-3" style="display: none; opacity: 0;">
+          <h3 class="q-title"><i class="fa-solid fa-utensils glow-cyan"></i> Dietary Footprint Profile</h3>
+          <p class="q-desc">Which profile best represents your standard weekly food consumption habits?</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(3, 'heavy', 3.6, 'Meat-focused livestock input.')">
+              <span class="opt-label">A. Daily Meat / Dairy Heavy Consumables</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(3, 'medium', 1.5, 'Poultry/Fish focus, partial meatless days.')">
+              <span class="opt-label">B. Mixed Diet (Meat, Dairy & Vegetable Mix)</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(3, 'green', 0.4, 'Low-impact local agricultural produce.')">
+              <span class="opt-label">C. Strict Plant-Based / Local Organic Produce</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Q4: Waste Management -->
+        <div class="question-card" id="q-4" style="display: none; opacity: 0;">
+          <h3 class="q-title"><i class="fa-solid fa-trash glow-cyan"></i> Material Disposal Loops</h3>
+          <p class="q-desc">How does your household process municipal solid waste and packaging?</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(4, 'heavy', 2.2, 'Direct waste dumping, no sorting.')">
+              <span class="opt-label">A. Landfill Disposal / Minimal Packaging Sort</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(4, 'medium', 0.9, 'Separates glass/aluminum, but uses plastics.')">
+              <span class="opt-label">B. Standard Recycling Sort (Paper, Plastic, Glass)</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(4, 'green', 0.1, 'Composts organic material, rejects packaging.')">
+              <span class="opt-label">C. Zero-Waste Cycle (Compost + High Recycle Loop)</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Q5: Water Consumption -->
+        <div class="question-card" id="q-5" style="display: none; opacity: 0;">
+          <h3 class="q-title"><i class="fa-solid fa-droplet glow-cyan"></i> Hydraulic Resource Footprint</h3>
+          <p class="q-desc">Select the option that describes your household water usage habits.</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(5, 'heavy', 1.8, 'Long showers, turf watering, active hose.')">
+              <span class="opt-label">A. High Resource (Long daily showers + frequent wash)</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(5, 'medium', 0.8, 'Shower timers, tap shutoff on brushing.')">
+              <span class="opt-label">B. Baseline Resource (Moderate daily consumption)</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(5, 'green', 0.2, 'Greywater recovery, low-flow adapters.')">
+              <span class="opt-label">C. Conservationist (Low-flow valves + rainwater reuse)</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Q6: Shopping Patterns -->
+        <div class="question-card" id="q-6" style="display: none; opacity: 0;">
+          <h3 class="q-title"><i class="fa-solid fa-bag-shopping glow-cyan"></i> Material Consumption Loops</h3>
+          <p class="q-desc">What is your approach to purchasing retail products, apparel, and electronics?</p>
+          <div class="option-grid">
+            <button class="option-card" onclick="submitAnswer(6, 'heavy', 2.6, 'Frequent tech upgrades, fast fashion.')">
+              <span class="opt-label">A. High Consumerism (Regular new purchases & wrapping)</span>
+              <span class="opt-value">High Carbon Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(6, 'medium', 1.2, 'Conscious purchases, reusable containers.')">
+              <span class="opt-label">B. Conscious Buying (Only as needed, reusable focus)</span>
+              <span class="opt-value">Moderate Resource Load</span>
+            </button>
+            <button class="option-card" onclick="submitAnswer(6, 'green', 0.2, 'Repair over replacement, circular commerce.')">
+              <span class="opt-label">C. Circular Economy (Repair culture, thrift & borrow)</span>
+              <span class="opt-value">Optimal Biomass Load</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PHASE 3: DIAGNOSTIC SCANNING PROGRESS -->
+    <div class="scan-phase" id="phase-progress" style="display: none; opacity: 0;">
+      <div class="scan-header">
+        <i class="fa-solid fa-microchip glow-cyan"></i>
+        <span>AI ANALYSIS CORE PROCESSING...</span>
+      </div>
+      
+      <div class="progress-scan-container">
+        <div class="scanner-hologram-radar">
+          <div class="radar-sweep"></div>
+          <span class="processing-core-label">RESTORE-OS ANALYZER</span>
+        </div>
+        
+        <!-- Dynamic terminal logging -->
+        <div class="scan-terminal-log" id="scan-terminal-log">
+          <div class="terminal-log-line info">> Booting lifestyle decryption channels...</div>
+        </div>
+        
+        <div class="scan-progress-bar-container">
+          <div class="scan-progress-bar">
+            <div class="scan-progress-fill" id="scan-progress-fill"></div>
+          </div>
+          <div class="scan-progress-labels">
+            <span id="scan-status-msg">COMPUTING CARBON TELEMETRY...</span>
+            <span id="scan-percentage-val">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PHASE 4: DOSSIER DOSSIER RESULTS -->
+    <div class="scan-phase" id="phase-results" style="display: none; opacity: 0;">
+      <div class="scan-header">
+        <i class="fa-solid fa-address-card glow-green"></i>
+        <span>GUARDIAN DOSSIER CREATED SECURELY</span>
+      </div>
+      
+      <div class="dossier-grid">
+        <!-- Main Stats Summary -->
+        <div class="dossier-left glass-panel-green">
+          <span class="dossier-label-mini">GUARDIAN PROFILE</span>
+          <h2 class="dossier-guardian-class" id="dossier-classification">PLANETARY STEWARD</h2>
+          
+          <div class="dossier-badge-row">
+            <div class="dossier-badge-letter" id="dossier-rating">A</div>
+            <div class="dossier-badge-desc">
+              <span class="dossier-label-mini">SUSTAINABILITY RATING</span>
+              <p style="font-size: 0.8rem; color: var(--text-cyan);" id="dossier-rating-description">Optimized ecosystem footprint detected.</p>
+            </div>
+          </div>
+          
+          <div class="dossier-score-card">
+            <span class="dossier-label-mini">ANNUAL CARBON FOOTPRINT</span>
+            <div class="dossier-score-num"><span id="dossier-carbon-val">0.0</span> <span style="font-size: 1.2rem; color: var(--text-muted);">t CO₂ / yr</span></div>
+            <div class="dossier-score-comparison" id="dossier-comparison">
+              VS Global Target: 2.0 t CO₂ / yr
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tailored Recommendations -->
+        <div class="dossier-right">
+          <span class="dossier-label-mini"><i class="fa-solid fa-list-check glow-cyan"></i> RECOMMENDATIONS FOR RESTORATION DECK</span>
+          
+          <div class="recommendations-box" id="dossier-recommendations">
+            <!-- Tailored items injected dynamically -->
+          </div>
+          
+          <button class="btn-cyber green-theme" id="btn-enter-game" onclick="completeOnboarding()" style="width: 100%; margin-top: 15px; font-size: 1rem;">
+            <i class="fa-solid fa-shield-halved"></i> Enter As Guardian
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Right Side: Rotating Earth Hologram & Command Feed -->
+  <div class="scan-hologram-side glass-panel">
+    <div class="hologram-header">
+      <i class="fa-solid fa-earth-americas glow-cyan"></i>
+      <span>ORBITAL TELEMETRY SCANNER</span>
+    </div>
+    
+    <!-- Three.js Canvas Container -->
+    <div class="scan-hologram-frame" id="threejs-canvas-parent">
+      <canvas id="scan-earth-canvas"></canvas>
+      <div class="scan-overlay-target">
+        <div class="target-corner top-left"></div>
+        <div class="target-corner top-right"></div>
+        <div class="target-corner bottom-left"></div>
+        <div class="target-corner bottom-right"></div>
+        <div class="holographic-laser-line" id="hologram-laser"></div>
+      </div>
+    </div>
+    
+    <!-- Live status telemetry list -->
+    <div class="scan-telemetry-feed" id="scan-telemetry-list">
+      <div class="telemetry-item">
+        <span class="telemetry-lbl">SAT CONNECT</span>
+        <span class="telemetry-val text-green">SECURE LINK (LOCKED)</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-lbl">ATMOSPHERE CO2</span>
+        <span class="telemetry-val text-red">428 PPM (CRITICAL)</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-lbl">BIOMASS DEFICIT</span>
+        <span class="telemetry-val text-yellow">-38.2%</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-lbl">WATER CLARITY</span>
+        <span class="telemetry-val text-yellow">25.0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/scan.js"></script>
+
+<%- include('partials/footer') %>
