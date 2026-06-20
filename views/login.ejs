@@ -1,559 +1,614 @@
 <%- include('partials/header') %>
 
-<div class="scanline"></div>
+  <div class="scanline"></div>
 
-<!-- BOOT SEQUENCE LOADER (Preserved & Enhanced) -->
-<div class="boot-container" id="boot-container">
-  <div class="boot-terminal">
-    <div class="boot-header">
-      <span>SYSTEM: RESTORE-OS v3.2.0</span>
-      <span>SECURE LINK ACTIVE</span>
-    </div>
-    
-    <!-- Rotating Hologram Globe -->
-    <div class="hologram-viewport-boot">
-      <div class="planet-hologram"></div>
-    </div>
-    
-    <div class="boot-logs" id="boot-logs">
-      <!-- Injected by script -->
-    </div>
-    
-    <div class="boot-progress-container">
-      <div class="boot-progress-bar">
-        <div class="boot-progress-fill" id="boot-fill"></div>
+  <!-- BOOT SEQUENCE LOADER (Preserved & Enhanced) -->
+  <div class="boot-container" id="boot-container">
+    <div class="boot-terminal">
+      <div class="boot-header">
+        <span>SYSTEM: RESTORE-OS v3.2.0</span>
+        <span>SECURE LINK ACTIVE</span>
       </div>
-      <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.85rem;">
-        <span style="color: var(--text-muted);" id="boot-status-text">INITIALIZING QUANTUM ARRAY...</span>
-        <span class="boot-percentage" id="boot-perc">0%</span>
+
+      <!-- Rotating Hologram Globe -->
+      <div class="hologram-viewport-boot">
+        <div class="planet-hologram"></div>
+      </div>
+
+      <div class="boot-logs" id="boot-logs">
+        <!-- Injected by script -->
+      </div>
+
+      <div class="boot-progress-container">
+        <div class="boot-progress-bar">
+          <div class="boot-progress-fill" id="boot-fill"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.85rem;">
+          <span style="color: var(--text-muted);" id="boot-status-text">INITIALIZING QUANTUM ARRAY...</span>
+          <span class="boot-percentage" id="boot-perc">0%</span>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MAIN AAA HUD LANDING EXPERIENCE -->
-<div class="hud-main-wrapper login-page" id="landing-wrapper" style="display: none; opacity: 0;">
-  
-  <!-- Glowing Background Grid -->
-  <div class="hud-grid-background"></div>
-  <div class="aurora-glow green-aurora"></div>
-  
-  <!-- THREE.JS HOLOGRAPHIC RESTORED PLANET -->
-  <div id="hologram-viewport" class="hologram-viewport"></div>
+  <!-- MAIN AAA HUD LANDING EXPERIENCE -->
+  <div class="hud-main-wrapper login-page" id="landing-wrapper" style="display: none; opacity: 0;">
 
-  <!-- HUD HEADER -->
-  <header class="hud-header">
-    <div class="logo-area">
-      <a href="/" class="logo-link">
-        <i class="fa-solid fa-satellite-dish glow-green"></i>
-        <span class="logo-text">EcoREALM</span>
-        <span class="logo-tag">RESTORATION COMMAND OS</span>
-      </a>
-    </div>
-    <div class="header-status">
-      <span class="pulse-indicator success"></span>
-      <span class="status-message">MAINFRAME CONNECTION ONLINE // REGIONAL NODES RESPONSE: 100% OK</span>
-    </div>
-  </header>
+    <!-- Glowing Background Grid -->
+    <div class="hud-grid-background"></div>
+    <div class="aurora-glow green-aurora"></div>
 
-  <!-- HUD SIDE PANEL - LEFT (Stats Deck) -->
-  <aside class="hud-panel left-panel glass-panel">
-    <div class="panel-header">
-      <i class="fa-solid fa-earth-oceania"></i> Biosphere Status
-    </div>
-    <div class="panel-body">
-      <div class="health-indicator-ring">
-        <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="40" class="ring-bg"></circle>
-          <circle cx="50" cy="50" r="40" class="ring-fill success" style="stroke-dasharray: 251.2; stroke-dashoffset: 62.8;"></circle>
-        </svg>
-        <div class="ring-label">
-          <span class="value text-green">75%</span>
-          <span class="desc">RECOVERY RATE</span>
+    <!-- THREE.JS HOLOGRAPHIC RESTORED PLANET -->
+    <div id="hologram-viewport" class="hologram-viewport"></div>
+
+    <!-- HUD HEADER -->
+    <header class="hud-header">
+      <div class="logo-area">
+        <a href="/" class="logo-link">
+          <i class="fa-solid fa-satellite-dish glow-green"></i>
+          <span class="logo-text">EcoREALM</span>
+          <span class="logo-tag">RESTORATION COMMAND OS</span>
+        </a>
+      </div>
+      <div class="header-status">
+        <span class="pulse-indicator success"></span>
+        <span class="status-message">MAINFRAME CONNECTION ONLINE // REGIONAL NODES RESPONSE: 100% OK</span>
+      </div>
+    </header>
+
+    <!-- HUD SIDE PANEL - LEFT (Stats Deck) -->
+    <aside class="hud-panel left-panel glass-panel">
+      <div class="panel-header">
+        <i class="fa-solid fa-earth-oceania"></i> Biosphere Status
+      </div>
+      <div class="panel-body">
+        <div class="health-indicator-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" class="ring-bg"></circle>
+            <circle cx="50" cy="50" r="40" class="ring-fill success"
+              style="stroke-dasharray: 251.2; stroke-dashoffset: 62.8;"></circle>
+          </svg>
+          <div class="ring-label">
+            <span class="value text-green">75%</span>
+            <span class="desc">RECOVERY RATE</span>
+          </div>
+        </div>
+
+        <div class="stat-list">
+          <div class="stat-item">
+            <span class="label">CURRENT ZONE TEMP</span>
+            <span class="value text-green">-0.12°C SHIFT</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">ACTIVE FOREST CORES</span>
+            <span class="value text-green">2,415 ACTIVE</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">OCEAN PLASTIC DENSITY</span>
+            <span class="value text-green">-45% REDUCTION</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">GRID RENEWABLES SHARES</span>
+            <span class="value text-green">89.4% POWER</span>
+          </div>
         </div>
       </div>
-      
-      <div class="stat-list">
-        <div class="stat-item">
-          <span class="label">CURRENT ZONE TEMP</span>
-          <span class="value text-green">-0.12°C SHIFT</span>
+    </aside>
+
+    <!-- CENTER CONSOLE - LOGIN FORM & SUCCESS OVERLAYS -->
+    <main class="hud-center-console">
+      <!-- Form console panel -->
+      <div class="registration-hud-card glass-panel" id="login-form-card">
+        <div class="hud-card-corners"></div>
+
+        <div class="console-header">
+          <h1 class="console-title">Welcome Back, Guardian</h1>
+          <p class="console-subtitle">The ecosystem awaits your command.</p>
         </div>
-        <div class="stat-item">
-          <span class="label">ACTIVE FOREST CORES</span>
-          <span class="value text-green">2,415 ACTIVE</span>
+
+        <div class="error-banner" id="error-banner" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span id="error-text">DEVIATION DETECTED</span>
         </div>
-        <div class="stat-item">
-          <span class="label">OCEAN PLASTIC DENSITY</span>
-          <span class="value text-green">-45% REDUCTION</span>
-        </div>
-        <div class="stat-item">
-          <span class="label">GRID RENEWABLES SHARES</span>
-          <span class="value text-green">89.4% POWER</span>
+
+        <form id="login-form" autocomplete="off">
+          <div class="input-hud-group">
+            <label for="email"><i class="fa-solid fa-envelope"></i> Core Comms Email</label>
+            <input type="email" id="email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org"
+              required>
+            <span class="input-line-glow"></span>
+          </div>
+
+          <div class="input-hud-group">
+            <label for="password"><i class="fa-solid fa-lock"></i> Command Decryption Key (Password)</label>
+            <input type="password" id="password" name="password" class="hud-input" placeholder="Enter password"
+              required>
+            <span class="input-line-glow"></span>
+          </div>
+
+          <div class="login-options-row">
+            <label class="hud-checkbox-container">
+              <input type="checkbox" id="rememberMe">
+              <span class="hud-checkbox-checkmark"></span>
+              <span class="checkbox-label">Keep Sync Active</span>
+            </label>
+            <a href="/forgot-password" class="link-cyan small-link">Forgot Credentials?</a>
+          </div>
+
+          <button type="submit" class="btn-hud-action primary-btn" id="submit-btn">
+            <span class="btn-glow-layer"></span>
+            <span class="btn-text"><i class="fa-solid fa-power-off"></i> Initialize Login</span>
+          </button>
+
+          <div class="divider">
+            <span>SECURE EXTERNAL CREDENTIAL LINK</span>
+          </div>
+
+          <button type="button" class="btn-hud-action secondary-btn" id="google-oauth-btn" onclick="googleOAuth()">
+            <span class="btn-text"><i class="fa-brands fa-google"></i> Login with Google</span>
+          </button>
+
+          <!-- Google OAuth HUD Modal -->
+          <div id="oauth-modal"
+            style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+            <div
+              style="background:linear-gradient(135deg,#0d1f1a,#0a1628); border:1px solid #5cffb3; border-radius:12px; padding:2rem 2.5rem; max-width:420px; width:90%; text-align:center; box-shadow:0 0 40px rgba(92,255,179,0.2); position:relative;">
+              <div
+                style="font-family:'Orbitron',monospace; color:#5cffb3; font-size:0.65rem; letter-spacing:3px; margin-bottom:1rem; opacity:0.7;">
+                // EXTERNAL CREDENTIAL LINK</div>
+              <div style="font-size:2.5rem; margin-bottom:1rem;"><i class="fa-brands fa-google"
+                  style="color:#5cffb3;"></i></div>
+              <h3
+                style="font-family:'Orbitron',monospace; color:#fff; font-size:1rem; margin-bottom:0.75rem; letter-spacing:1px;">
+                GOOGLE OAUTH OFFLINE</h3>
+              <p style="color:#8ba3a0; font-size:0.82rem; line-height:1.6; margin-bottom:1.5rem;">Google Authentication
+                integration is currently being configured for this command node.<br><br>Please use your <span
+                  style="color:#53e8ff;">email &amp; password</span> to authenticate.</p>
+              <button onclick="document.getElementById('oauth-modal').style.display='none'"
+                style="background:linear-gradient(90deg,#5cffb3,#53e8ff); border:none; border-radius:6px; padding:0.6rem 1.8rem; font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:#0a1628; cursor:pointer; letter-spacing:1px;">UNDERSTOOD
+                — CLOSE</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="console-footer">
+          <span>Not yet synced in mainframe? <a href="/register" class="link-cyan">Register Callsign</a></span>
         </div>
       </div>
-    </div>
-  </aside>
 
-  <!-- CENTER CONSOLE - LOGIN FORM & SUCCESS OVERLAYS -->
-  <main class="hud-center-console">
-    <!-- Form console panel -->
-    <div class="registration-hud-card glass-panel" id="login-form-card">
-      <div class="hud-card-corners"></div>
-      
-      <div class="console-header">
-        <h1 class="console-title">Welcome Back, Guardian</h1>
-        <p class="console-subtitle">The ecosystem awaits your command.</p>
-      </div>
+      <!-- Holographic success credential screen -->
+      <div class="success-credential-panel glass-panel" id="success-stats-panel"
+        style="display: none; opacity: 0; transform: scale(0.9);">
+        <div class="hud-card-corners"></div>
 
-      <div class="error-banner" id="error-banner" style="display: none;">
-        <i class="fa-solid fa-triangle-exclamation"></i> <span id="error-text">DEVIATION DETECTED</span>
-      </div>
+        <div class="scanner-bar-overlay" id="scanner-line"></div>
 
-      <form id="login-form" autocomplete="off">
-        <div class="input-hud-group">
-          <label for="email"><i class="fa-solid fa-envelope"></i> Core Comms Email</label>
-          <input type="email" id="email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org" required>
-          <span class="input-line-glow"></span>
+        <div class="success-header">
+          <i class="fa-solid fa-circle-check text-green bounce-anim" style="font-size: 3rem;"></i>
+          <h2 class="success-title">Guardian Authenticated</h2>
+          <p class="success-subtitle">RESTORE-OS MAIN SYSTEM SYNC ESTABLISHED</p>
         </div>
 
-        <div class="input-hud-group">
-          <label for="password"><i class="fa-solid fa-lock"></i> Command Decryption Key (Password)</label>
-          <input type="password" id="password" name="password" class="hud-input" placeholder="Enter password" required>
-          <span class="input-line-glow"></span>
+        <div class="stats-deck">
+          <div class="deck-card">
+            <span class="label">GUARDIAN RANK</span>
+            <span class="value text-green" id="user-rank">SEED GUARDIAN</span>
+          </div>
+          <div class="deck-card">
+            <span class="label">LEVEL</span>
+            <span class="value text-cyan" id="user-level">1</span>
+          </div>
+          <div class="deck-card">
+            <span class="label">ECO POINTS</span>
+            <span class="value text-green" id="user-coins">100</span>
+          </div>
+          <div class="deck-card">
+            <span class="label">OFFSET IMPACT</span>
+            <span class="value text-cyan" id="user-impact">0 kg CO₂</span>
+          </div>
         </div>
 
-        <div class="login-options-row">
-          <label class="hud-checkbox-container">
-            <input type="checkbox" id="rememberMe">
-            <span class="hud-checkbox-checkmark"></span>
-            <span class="checkbox-label">Keep Sync Active</span>
-          </label>
-          <a href="/forgot-password" class="link-cyan small-link">Forgot Credentials?</a>
+        <div class="deck-status-bar">
+          <span class="log">> SECTOR ACCESS AUTHORIZED...</span>
+          <span class="log">> SYNCING DIAGNOSTIC SCAN INTERFACE...</span>
         </div>
 
-        <button type="submit" class="btn-hud-action primary-btn" id="submit-btn">
-          <span class="btn-glow-layer"></span>
-          <span class="btn-text"><i class="fa-solid fa-power-off"></i> Initialize Login</span>
+        <button class="btn-hud-action primary-btn green-theme" style="margin-top: 15px;" onclick="goToScan()">
+          <span class="btn-text">Initialize Diagnostic Scan <i class="fa-solid fa-circle-play"></i></span>
         </button>
+      </div>
+    </main>
 
-        <div class="divider">
-          <span>SECURE EXTERNAL CREDENTIAL LINK</span>
+    <!-- HUD SIDE PANEL - RIGHT (Atmospheric Telemetry) -->
+    <aside class="hud-panel right-panel glass-panel">
+      <div class="panel-header">
+        <i class="fa-solid fa-chart-pie"></i> Restoration Statistics
+      </div>
+      <div class="panel-body">
+        <div class="telemetry-box success">
+          <span class="label">LIVE CO₂ REDUCTION</span>
+          <span class="value text-green">-3.28 T/MO</span>
+          <span class="delta"><i class="fa-solid fa-circle-check"></i> MEETS PARITY GOAL</span>
         </div>
 
-        <button type="button" class="btn-hud-action secondary-btn" onclick="googleOAuth()">
-          <span class="btn-text"><i class="fa-brands fa-google"></i> Login with Google</span>
-        </button>
-      </form>
-
-      <div class="console-footer">
-        <span>Not yet synced in mainframe? <a href="/register" class="link-cyan">Register Callsign</a></span>
-      </div>
-    </div>
-
-    <!-- Holographic success credential screen -->
-    <div class="success-credential-panel glass-panel" id="success-stats-panel" style="display: none; opacity: 0; transform: scale(0.9);">
-      <div class="hud-card-corners"></div>
-      
-      <div class="scanner-bar-overlay" id="scanner-line"></div>
-      
-      <div class="success-header">
-        <i class="fa-solid fa-circle-check text-green bounce-anim" style="font-size: 3rem;"></i>
-        <h2 class="success-title">Guardian Authenticated</h2>
-        <p class="success-subtitle">RESTORE-OS MAIN SYSTEM SYNC ESTABLISHED</p>
-      </div>
-
-      <div class="stats-deck">
-        <div class="deck-card">
-          <span class="label">GUARDIAN RANK</span>
-          <span class="value text-green" id="user-rank">SEED GUARDIAN</span>
+        <div class="telemetry-box success">
+          <span class="label">BIODIVERSITY RATE</span>
+          <span class="value text-green">+1.15%</span>
+          <span class="delta"><i class="fa-solid fa-arrow-trend-up"></i> FLORA POPULATION INCR</span>
         </div>
-        <div class="deck-card">
-          <span class="label">LEVEL</span>
-          <span class="value text-cyan" id="user-level">1</span>
+
+        <div class="telemetry-box info">
+          <span class="label">GLOBAL IMPACT SCORE</span>
+          <span class="value text-cyan">4,284 TONS</span>
+          <span class="delta"><i class="fa-solid fa-globe"></i> REGIONAL TARGET SECURED</span>
         </div>
-        <div class="deck-card">
-          <span class="label">ECO POINTS</span>
-          <span class="value text-green" id="user-coins">100</span>
-        </div>
-        <div class="deck-card">
-          <span class="label">OFFSET IMPACT</span>
-          <span class="value text-cyan" id="user-impact">0 kg CO₂</span>
+
+        <div class="sensor-feed">
+          <span class="sensor-header">ACTIVE CONSERVATION SHIELD</span>
+          <div class="sensor-grid">
+            <div class="sensor-dot green">1A</div>
+            <div class="sensor-dot green">2B</div>
+            <div class="sensor-dot green">3C</div>
+            <div class="sensor-dot green">4D</div>
+          </div>
         </div>
       </div>
+    </aside>
+  </div>
 
-      <div class="deck-status-bar">
-        <span class="log">> SECTOR ACCESS AUTHORIZED...</span>
-        <span class="log">> SYNCING DIAGNOSTIC SCAN INTERFACE...</span>
-      </div>
-      
-      <button class="btn-hud-action primary-btn green-theme" style="margin-top: 15px;" onclick="goToScan()">
-        <span class="btn-text">Initialize Diagnostic Scan <i class="fa-solid fa-circle-play"></i></span>
-      </button>
-    </div>
-  </main>
-
-  <!-- HUD SIDE PANEL - RIGHT (Atmospheric Telemetry) -->
-  <aside class="hud-panel right-panel glass-panel">
-    <div class="panel-header">
-      <i class="fa-solid fa-chart-pie"></i> Restoration Statistics
-    </div>
-    <div class="panel-body">
-      <div class="telemetry-box success">
-        <span class="label">LIVE CO₂ REDUCTION</span>
-        <span class="value text-green">-3.28 T/MO</span>
-        <span class="delta"><i class="fa-solid fa-circle-check"></i> MEETS PARITY GOAL</span>
-      </div>
-      
-      <div class="telemetry-box success">
-        <span class="label">BIODIVERSITY RATE</span>
-        <span class="value text-green">+1.15%</span>
-        <span class="delta"><i class="fa-solid fa-arrow-trend-up"></i> FLORA POPULATION INCR</span>
-      </div>
-
-      <div class="telemetry-box info">
-        <span class="label">GLOBAL IMPACT SCORE</span>
-        <span class="value text-cyan">4,284 TONS</span>
-        <span class="delta"><i class="fa-solid fa-globe"></i> REGIONAL TARGET SECURED</span>
-      </div>
-
-      <div class="sensor-feed">
-        <span class="sensor-header">ACTIVE CONSERVATION SHIELD</span>
-        <div class="sensor-grid">
-          <div class="sensor-dot green">1A</div>
-          <div class="sensor-dot green">2B</div>
-          <div class="sensor-dot green">3C</div>
-          <div class="sensor-dot green">4D</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-</div>
-
-<!-- Synth Audio Controller -->
-<script>
-  let audioCtx = null;
-  function getAudioContext() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return audioCtx;
-  }
-
-  function playSound(freq, type, duration, vol = 0.1) {
-    try {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gainNode.gain.setValueAtTime(vol, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch(e) {}
-  }
-
-  function playHoverSound() { playSound(600, 'sine', 0.08, 0.03); }
-  function playClickSound() { playSound(400, 'triangle', 0.15, 0.08); }
-  function playSuccessSound() {
-    playSound(261.63, 'sawtooth', 0.2, 0.06); // C4
-    setTimeout(() => playSound(329.63, 'sawtooth', 0.2, 0.06), 120); // E4
-    setTimeout(() => playSound(392.00, 'sawtooth', 0.2, 0.06), 240); // G4
-    setTimeout(() => playSound(523.25, 'sine', 0.5, 0.1), 360); // C5
-  }
-
-  function attachHoverSounds() {
-    document.querySelectorAll('.btn-hud-action, .hud-input, .logo-link, .link-cyan').forEach(el => {
-      if (!el.dataset.soundAttached) {
-        el.addEventListener('mouseenter', playHoverSound);
-        el.addEventListener('click', playClickSound);
-        el.dataset.soundAttached = "true";
+  <!-- Synth Audio Controller -->
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-    });
-  }
-
-  // Simulation Boot Loader (Enhanced)
-  const bootMessages = [
-    { text: "INCOMING SECURE MAIN COMMAND CORE DATA...", type: "info" },
-    { text: "CALIBRATING HOLOGRAPHIC BIOMASS GRID COMPILERS...", type: "info" },
-    { text: "DECRYPTING QUANTUM DEFENSE ENCRYPTIONS... 100% OK", type: "success" },
-    { text: "ESTABLISHING ECO-CORES RESPONSE SIGNALS... RESPONSE DETECTED", type: "info" },
-    { text: "SYNCHRONIZING SATELLITE TERRAFORM DATA CHANNELS...", type: "info" },
-    { text: "WARP SECTORS 1-6 LOADED SUCCESSFULLY.", type: "success" },
-    { text: "RESTORE-OS v3.2.0 READY. STANDING BY FOR GUARDIAN AUTHENTICATION...", type: "success" }
-  ];
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const errorPresent = <%= error ? "true" : "false" %>;
-    if (errorPresent) {
-      document.getElementById('boot-container').style.display = 'none';
-      const landing = document.getElementById('landing-wrapper');
-      landing.style.display = 'flex';
-      landing.style.opacity = '1';
-      attachHoverSounds();
-      initThree();
-      return;
+      return audioCtx;
     }
 
-    const logsContainer = document.getElementById('boot-logs');
-    const fill = document.getElementById('boot-fill');
-    const perc = document.getElementById('boot-perc');
-    const statusText = document.getElementById('boot-status-text');
-
-    let msgIndex = 0;
-    let progress = 0;
-
-    function addLogLine() {
-      if (msgIndex < bootMessages.length) {
-        const msg = bootMessages[msgIndex];
-        const line = document.createElement('div');
-        line.className = `boot-log-line ${msg.type}`;
-        line.innerHTML = `<span>></span> <span>${msg.text}</span>`;
-        logsContainer.appendChild(line);
-        logsContainer.scrollTop = logsContainer.scrollHeight;
-        statusText.textContent = msg.text;
-        
-        playSound(350 + (msgIndex * 40), 'sine', 0.05, 0.02);
-        msgIndex++;
-        setTimeout(addLogLine, 200 + Math.random() * 150);
-      }
+    function playSound(freq, type, duration, vol = 0.1) {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gainNode.gain.setValueAtTime(vol, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) { }
     }
 
-    function updateLoader() {
-      progress += Math.floor(Math.random() * 4) + 1;
-      if (progress > 100) progress = 100;
-      
-      fill.style.width = `${progress}%`;
-      perc.textContent = `${progress}%`;
-
-      if (progress < 100) {
-        setTimeout(updateLoader, 20 + Math.random() * 15);
-      } else {
-        setTimeout(finishBoot, 400);
-      }
+    function playHoverSound() { playSound(600, 'sine', 0.08, 0.03); }
+    function playClickSound() { playSound(400, 'triangle', 0.15, 0.08); }
+    function playSuccessSound() {
+      playSound(261.63, 'sawtooth', 0.2, 0.06); // C4
+      setTimeout(() => playSound(329.63, 'sawtooth', 0.2, 0.06), 120); // E4
+      setTimeout(() => playSound(392.00, 'sawtooth', 0.2, 0.06), 240); // G4
+      setTimeout(() => playSound(523.25, 'sine', 0.5, 0.1), 360); // C5
     }
 
-    addLogLine();
-    updateLoader();
-
-    function finishBoot() {
-      // Play a short synth chime
-      playSound(200, 'triangle', 0.5, 0.05);
-      setTimeout(() => playSound(400, 'triangle', 0.4, 0.08), 150);
-
-      gsap.to('#boot-container', {
-        opacity: 0,
-        duration: 0.6,
-        onComplete: () => {
-          document.getElementById('boot-container').style.display = 'none';
-          const landing = document.getElementById('landing-wrapper');
-          landing.style.display = 'flex';
-          gsap.to(landing, { opacity: 1, duration: 0.6 });
-          attachHoverSounds();
-          initThree();
-          if (typeof window.signalBootComplete === 'function') {
-            window.signalBootComplete();
-          }
+    function attachHoverSounds() {
+      document.querySelectorAll('.btn-hud-action, .hud-input, .logo-link, .link-cyan').forEach(el => {
+        if (!el.dataset.soundAttached) {
+          el.addEventListener('mouseenter', playHoverSound);
+          el.addEventListener('click', playClickSound);
+          el.dataset.soundAttached = "true";
         }
       });
     }
-  });
 
-  // Three.js Restored Planet Globe Setup
-  let scene, camera, renderer, globe, particles;
-  
-  function initThree() {
-    const container = document.getElementById('hologram-viewport');
-    if (!container) return;
+    // Simulation Boot Loader (Enhanced)
+    const bootMessages = [
+      { text: "INCOMING SECURE MAIN COMMAND CORE DATA...", type: "info" },
+      { text: "CALIBRATING HOLOGRAPHIC BIOMASS GRID COMPILERS...", type: "info" },
+      { text: "DECRYPTING QUANTUM DEFENSE ENCRYPTIONS... 100% OK", type: "success" },
+      { text: "ESTABLISHING ECO-CORES RESPONSE SIGNALS... RESPONSE DETECTED", type: "info" },
+      { text: "SYNCHRONIZING SATELLITE TERRAFORM DATA CHANNELS...", type: "info" },
+      { text: "WARP SECTORS 1-6 LOADED SUCCESSFULLY.", type: "success" },
+      { text: "RESTORE-OS v3.2.0 READY. STANDING BY FOR GUARDIAN AUTHENTICATION...", type: "success" }
+    ];
 
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 18;
-
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.appendChild(renderer.domElement);
-
-    // Restored Planet Globe Geometry (Vibrant Green Wireframe)
-    const geometry = new THREE.IcosahedronGeometry(5, 2);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0x5CFFB3, // Neon Green
-      wireframe: true,
-      transparent: true,
-      opacity: 0.45
-    });
-    globe = new THREE.Mesh(geometry, material);
-    scene.add(globe);
-
-    // Add Green Nodes/Restored Points at vertices
-    const positions = geometry.attributes.position;
-    const nodeGeo = new THREE.SphereGeometry(0.12, 8, 8);
-    const nodeMat = new THREE.MeshBasicMaterial({ color: 0x53E8FF, transparent: true, opacity: 0.8 }); // Cyan nodes
-    
-    // Deploy nodes
-    for(let i = 0; i < 12; i++) {
-      const index = Math.floor(Math.random() * (positions.count));
-      const x = positions.getX(index);
-      const y = positions.getY(index);
-      const z = positions.getZ(index);
-      
-      const node = new THREE.Mesh(nodeGeo, nodeMat);
-      node.position.set(x, y, z);
-      globe.add(node);
-    }
-
-    // Add Restored Flora Particle Cloud (Cyan & Green mix)
-    const particleCount = 250;
-    const particleGeo = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = 5.3 + Math.random() * 2.5;
-
-      particlePositions[i] = r * Math.sin(phi) * Math.cos(theta);
-      particlePositions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
-      particlePositions[i + 2] = r * Math.cos(phi);
-
-      // Randomly green or cyan colors
-      if (Math.random() > 0.5) {
-        colors[i] = 0.36;     // 5CFFB3 Green
-        colors[i + 1] = 1.0;
-        colors[i + 2] = 0.7;
-      } else {
-        colors[i] = 0.32;     // 53E8FF Cyan
-        colors[i + 1] = 0.91;
-        colors[i + 2] = 1.0;
-      }
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-    particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-      size: 0.08,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.8
-    });
-
-    particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-      globe.rotation.y += 0.003;
-      globe.rotation.x += 0.001;
-      particles.rotation.y -= 0.0015;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Mouse movement rotation response
-    document.addEventListener('mousemove', (e) => {
-      const mouseX = (e.clientX / window.innerWidth) - 0.5;
-      const mouseY = (e.clientY / window.innerHeight) - 0.5;
-      gsap.to(globe.rotation, { y: mouseX * 2.5, x: mouseY * 2.5, duration: 2 });
-    });
-
-    window.addEventListener('resize', () => {
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    });
-  }
-
-  function googleOAuth() {
-    alert("Initiating secure login link with Google mainframe... (Simulated)");
-  }
-
-  function goToScan() {
-    window.location.href = '/scan';
-  }
-
-  // Handle Form Submit
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    const errorBanner = document.getElementById('error-banner');
-    const btn = document.getElementById('submit-btn');
-
-    errorBanner.style.display = 'none';
-    btn.disabled = true;
-    btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> AUTHENTICATING DECRYPTION KEY...`;
-
-    // Visual scan overlay animation on submit
-    const scanLine = document.createElement('div');
-    scanLine.className = 'scanner-scanline-beam';
-    document.getElementById('login-form-card').appendChild(scanLine);
-    gsap.to(scanLine, { top: '100%', duration: 1.2, ease: 'power2.inOut', onComplete: () => scanLine.remove() });
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Authentication code rejected.");
+    window.addEventListener('DOMContentLoaded', () => {
+      const errorPresent = <%= error ? "true" : "false" %>;
+      if (errorPresent) {
+        document.getElementById('boot-container').style.display = 'none';
+        const landing = document.getElementById('landing-wrapper');
+        landing.style.display = 'flex';
+        landing.style.opacity = '1';
+        attachHoverSounds();
+        initThree();
+        return;
       }
 
-      // Play success chime
-      playSuccessSound();
+      const logsContainer = document.getElementById('boot-logs');
+      const fill = document.getElementById('boot-fill');
+      const perc = document.getElementById('boot-perc');
+      const statusText = document.getElementById('boot-status-text');
 
-      // Hydrate stats deck display
-      document.getElementById('user-rank').textContent = (data.user.rank || 'Seed Guardian').toUpperCase();
-      document.getElementById('user-level').textContent = data.user.level || 1;
-      document.getElementById('user-coins').textContent = data.user.ecoPoints || 100;
-      document.getElementById('user-impact').textContent = `${(data.user.carbonScore || 0).toFixed(1)} kg CO₂`;
+      let msgIndex = 0;
+      let progress = 0;
 
-      // Animate card swap (Form -> Stats Deck)
-      gsap.to('#login-form-card', {
-        opacity: 0,
-        scale: 0.95,
-        duration: 0.5,
-        onComplete: () => {
-          document.getElementById('login-form-card').style.display = 'none';
-          
-          const statsPanel = document.getElementById('success-stats-panel');
-          statsPanel.style.display = 'block';
-          gsap.to(statsPanel, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.6,
-            ease: 'back.out(1.2)',
-            onComplete: () => {
-              // Pulse scanner beam on success panel
-              gsap.fromTo('#scanner-line', 
-                { top: '0%' }, 
-                { top: '100%', duration: 2.5, repeat: -1, ease: 'power1.inOut' }
-              );
+      function addLogLine() {
+        if (msgIndex < bootMessages.length) {
+          const msg = bootMessages[msgIndex];
+          const line = document.createElement('div');
+          line.className = `boot-log-line ${msg.type}`;
+          line.innerHTML = `<span>></span> <span>${msg.text}</span>`;
+          logsContainer.appendChild(line);
+          logsContainer.scrollTop = logsContainer.scrollHeight;
+          statusText.textContent = msg.text;
+
+          playSound(350 + (msgIndex * 40), 'sine', 0.05, 0.02);
+          msgIndex++;
+          setTimeout(addLogLine, 200 + Math.random() * 150);
+        }
+      }
+
+      function updateLoader() {
+        progress += Math.floor(Math.random() * 4) + 1;
+        if (progress > 100) progress = 100;
+
+        fill.style.width = `${progress}%`;
+        perc.textContent = `${progress}%`;
+
+        if (progress < 100) {
+          setTimeout(updateLoader, 20 + Math.random() * 15);
+        } else {
+          setTimeout(finishBoot, 400);
+        }
+      }
+
+      addLogLine();
+      updateLoader();
+
+      function finishBoot() {
+        // Play a short synth chime
+        playSound(200, 'triangle', 0.5, 0.05);
+        setTimeout(() => playSound(400, 'triangle', 0.4, 0.08), 150);
+
+        gsap.to('#boot-container', {
+          opacity: 0,
+          duration: 0.6,
+          onComplete: () => {
+            document.getElementById('boot-container').style.display = 'none';
+            const landing = document.getElementById('landing-wrapper');
+            landing.style.display = 'flex';
+            gsap.to(landing, { opacity: 1, duration: 0.6 });
+            attachHoverSounds();
+            initThree();
+            if (typeof window.signalBootComplete === 'function') {
+              window.signalBootComplete();
             }
-          });
+          }
+        });
+      }
+    });
+
+    // Three.js Restored Planet Globe Setup
+    let scene, camera, renderer, globe, particles;
+
+    function initThree() {
+      const container = document.getElementById('hologram-viewport');
+      if (!container) return;
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.z = 18;
+
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Restored Planet Globe Geometry (Vibrant Green Wireframe)
+      const geometry = new THREE.IcosahedronGeometry(5, 2);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x5CFFB3, // Neon Green
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45
+      });
+      globe = new THREE.Mesh(geometry, material);
+      scene.add(globe);
+
+      // Add Green Nodes/Restored Points at vertices
+      const positions = geometry.attributes.position;
+      const nodeGeo = new THREE.SphereGeometry(0.12, 8, 8);
+      const nodeMat = new THREE.MeshBasicMaterial({ color: 0x53E8FF, transparent: true, opacity: 0.8 }); // Cyan nodes
+
+      // Deploy nodes
+      for (let i = 0; i < 12; i++) {
+        const index = Math.floor(Math.random() * (positions.count));
+        const x = positions.getX(index);
+        const y = positions.getY(index);
+        const z = positions.getZ(index);
+
+        const node = new THREE.Mesh(nodeGeo, nodeMat);
+        node.position.set(x, y, z);
+        globe.add(node);
+      }
+
+      // Add Restored Flora Particle Cloud (Cyan & Green mix)
+      const particleCount = 250;
+      const particleGeo = new THREE.BufferGeometry();
+      const particlePositions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = 5.3 + Math.random() * 2.5;
+
+        particlePositions[i] = r * Math.sin(phi) * Math.cos(theta);
+        particlePositions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+        particlePositions[i + 2] = r * Math.cos(phi);
+
+        // Randomly green or cyan colors
+        if (Math.random() > 0.5) {
+          colors[i] = 0.36;     // 5CFFB3 Green
+          colors[i + 1] = 1.0;
+          colors[i + 2] = 0.7;
+        } else {
+          colors[i] = 0.32;     // 53E8FF Cyan
+          colors[i + 1] = 0.91;
+          colors[i + 2] = 1.0;
         }
+      }
+
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+      particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const particleMat = new THREE.PointsMaterial({
+        size: 0.08,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8
       });
 
-    } catch (err) {
-      btn.disabled = false;
-      btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-power-off"></i> Initialize Login`;
-      document.getElementById('error-text').textContent = `AUTHENTICITY DEVIATION: ${err.message.toUpperCase()}`;
-      errorBanner.style.display = 'block';
-      playSound(180, 'sawtooth', 0.3, 0.08); // Error synth tone
-    }
-  });
-</script>
+      particles = new THREE.Points(particleGeo, particleMat);
+      scene.add(particles);
 
-<%- include('partials/footer') %>
+      // Animation Loop
+      function animate() {
+        requestAnimationFrame(animate);
+        globe.rotation.y += 0.003;
+        globe.rotation.x += 0.001;
+        particles.rotation.y -= 0.0015;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Mouse movement rotation response
+      document.addEventListener('mousemove', (e) => {
+        const mouseX = (e.clientX / window.innerWidth) - 0.5;
+        const mouseY = (e.clientY / window.innerHeight) - 0.5;
+        gsap.to(globe.rotation, { y: mouseX * 2.5, x: mouseY * 2.5, duration: 2 });
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    function googleOAuth() {
+      const modal = document.getElementById('oauth-modal');
+      modal.style.display = 'flex';
+      // Close on backdrop click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      }, { once: true });
+    }
+
+    function goToScan() {
+      window.location.href = '/scan';
+    }
+
+    // Handle Form Submit
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const errorBanner = document.getElementById('error-banner');
+      const btn = document.getElementById('submit-btn');
+
+      errorBanner.style.display = 'none';
+      btn.disabled = true;
+      btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> AUTHENTICATING DECRYPTION KEY...`;
+
+      // Visual scan overlay animation on submit
+      const scanLine = document.createElement('div');
+      scanLine.className = 'scanner-scanline-beam';
+      document.getElementById('login-form-card').appendChild(scanLine);
+      gsap.to(scanLine, { top: '100%', duration: 1.2, ease: 'power2.inOut', onComplete: () => scanLine.remove() });
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Authentication code rejected.");
+        }
+
+        // Play success chime
+        playSuccessSound();
+
+        // Hydrate stats deck display
+        document.getElementById('user-rank').textContent = (data.user.rank || 'Seed Guardian').toUpperCase();
+        document.getElementById('user-level').textContent = data.user.level || 1;
+        document.getElementById('user-coins').textContent = data.user.ecoPoints || 100;
+        document.getElementById('user-impact').textContent = `${(data.user.carbonScore || 0).toFixed(1)} kg CO₂`;
+
+        // Animate card swap (Form -> Stats Deck)
+        gsap.to('#login-form-card', {
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.5,
+          onComplete: () => {
+            document.getElementById('login-form-card').style.display = 'none';
+
+            const statsPanel = document.getElementById('success-stats-panel');
+            statsPanel.style.display = 'block';
+            gsap.to(statsPanel, {
+              opacity: 1,
+              scale: 1,
+              duration: 0.6,
+              ease: 'back.out(1.2)',
+              onComplete: () => {
+                // Pulse scanner beam on success panel
+                gsap.fromTo('#scanner-line',
+                  { top: '0%' },
+                  { top: '100%', duration: 2.5, repeat: -1, ease: 'power1.inOut' }
+                );
+              }
+            });
+          }
+        });
+
+      } catch (err) {
+        btn.disabled = false;
+        btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-power-off"></i> Initialize Login`;
+        document.getElementById('error-text').textContent = `AUTHENTICITY DEVIATION: ${err.message.toUpperCase()}`;
+        errorBanner.style.display = 'block';
+        playSound(180, 'sawtooth', 0.3, 0.08); // Error synth tone
+      }
+    });
+  </script>
+
+  <!-- Google OAuth HUD Modal (top-level full-screen overlay) -->
+  <div id="oauth-modal"
+    style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+    <div
+      style="background:linear-gradient(135deg,#0d1f1a,#0a1628); border:1px solid #5cffb3; border-radius:14px; padding:2.5rem 3rem; max-width:440px; width:90%; text-align:center; box-shadow:0 0 60px rgba(92,255,179,0.25), 0 0 20px rgba(83,232,255,0.1);">
+      <div
+        style="font-family:'Orbitron',monospace; color:#5cffb3; font-size:0.6rem; letter-spacing:4px; margin-bottom:1.2rem; opacity:0.7;">
+        // SECURE EXTERNAL CREDENTIAL LINK</div>
+      <div style="font-size:3rem; margin-bottom:1rem;"><i class="fa-brands fa-google"
+          style="color:#5cffb3; filter:drop-shadow(0 0 10px rgba(92,255,179,0.6));"></i></div>
+      <h3
+        style="font-family:'Orbitron',monospace; color:#ffffff; font-size:1.1rem; margin-bottom:0.8rem; letter-spacing:2px;">
+        GOOGLE OAUTH OFFLINE</h3>
+      <div style="width:60px; height:2px; background:linear-gradient(90deg,#5cffb3,#53e8ff); margin:0 auto 1.2rem;">
+      </div>
+      <p style="color:#8ba3a0; font-size:0.82rem; line-height:1.7; margin-bottom:1.8rem;">Google Authentication is
+        currently being configured for this command node.<br><br>Please use your <span
+          style="color:#53e8ff; font-weight:600;">email &amp; password</span> credentials to authenticate.</p>
+      <button id="oauth-close-btn"
+        style="background:linear-gradient(90deg,#5cffb3,#53e8ff); border:none; border-radius:6px; padding:0.65rem 2rem; font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:#0a1628; cursor:pointer; letter-spacing:1px; transition:opacity 0.2s;"
+        onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">UNDERSTOOD &#8212; CLOSE</button>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>

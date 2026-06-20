@@ -157,13 +157,14 @@ const requireAuth = async (req, res, next) => {
           email: user.email,
           level: user.level || 1,
           xp: user.xp || 0,
-          coins: user.ecoPoints || 100,
-          carbonOffset: user.carbonScore || 0,
+          coins: user.coins !== undefined ? user.coins : 100,
+          carbonOffset: user.carbonOffset !== undefined ? user.carbonOffset : 0,
           waterSaved: user.waterSaved || 0,
           energyConserved: user.energyConserved || 0,
           rank: user.rank || 'Seed Guardian',
           netZeroUnlocked: user.netZeroUnlocked || false,
           customTitleBought: user.customTitleBought || false,
+          scanCompleted: user.scanCompleted || false,
           island: user.island || {
             trees: 1,
             flowers: 1,
@@ -181,16 +182,43 @@ const requireAuth = async (req, res, next) => {
     }
   }
 
-  // Redirect if not authenticated
-  res.redirect('/login');
+  // Redirect to root route (which dynamically shows login EJS directly)
+  res.redirect('/');
+};
+
+// Sync session state back to MongoDB User record (both real and mock DB)
+const syncSessionToDb = async (req) => {
+  if (!req.session?.user) return;
+  const token = req.cookies?.token;
+  if (token) {
+    try {
+      const jwt = require('jsonwebtoken');
+      const User = require('./models/User');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      await User.findByIdAndUpdate(decoded.id, {
+        level: req.session.user.level,
+        xp: req.session.user.xp,
+        coins: req.session.user.coins,
+        carbonOffset: req.session.user.carbonOffset,
+        waterSaved: req.session.user.waterSaved,
+        energyConserved: req.session.user.energyConserved,
+        rank: req.session.user.rank,
+        netZeroUnlocked: req.session.user.netZeroUnlocked,
+        customTitleBought: req.session.user.customTitleBought,
+        scanCompleted: req.session.user.scanCompleted,
+        island: req.session.user.island,
+        history: req.session.user.history
+      });
+    } catch (err) {
+      console.warn('⚠️ MongoDB sync failed:', err.message);
+    }
+  }
 };
 
 // ================= EJS FRONTEND ROUTES =================
 app.get('/login', (req, res) => {
-  if (req.session?.user || req.cookies?.token) {
-    return res.redirect('/');
-  }
-  res.render('login', { error: null });
+  res.redirect('/');
 });
 
 app.get('/register', (req, res) => {
@@ -211,21 +239,25 @@ app.post('/login', (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
-    res.redirect('/login');
+    res.redirect('/');
   });
 });
 
 app.get('/scan', requireAuth, (req, res) => {
+  if (req.session.user?.scanCompleted) {
+    return res.redirect('/');
+  }
   res.render('scan', { user: req.session.user });
 });
 
-app.post('/api/save-scan', requireAuth, (req, res) => {
+app.post('/api/save-scan', requireAuth, async (req, res) => {
   const { carbonScore, rating, classification } = req.body;
   const user = req.session.user;
   
   if (user) {
     user.rank = classification || 'Eco-Novice';
     user.startingCarbonScore = carbonScore || 16.0;
+    user.scanCompleted = true;
     
     user.history.unshift({
       name: `Initialized profile as ${user.rank} (Carbon Score: ${user.startingCarbonScore}t)`,
@@ -233,6 +265,7 @@ app.post('/api/save-scan', requireAuth, (req, res) => {
       coins: 0,
       xp: 0
     });
+    await syncSessionToDb(req);
   }
   res.json({ success: true });
 });
@@ -241,7 +274,7 @@ app.get('/knowledge', requireAuth, (req, res) => {
   res.render('knowledge', { user: req.session.user });
 });
 
-app.post('/api/buy-xp', requireAuth, (req, res) => {
+app.post('/api/buy-xp', requireAuth, async (req, res) => {
   const user = req.session.user;
   const cost = 50;
   if (user.coins < cost) {
@@ -261,7 +294,7 @@ app.post('/api/buy-xp', requireAuth, (req, res) => {
     coins: -cost,
     xp: 100
   });
-  
+  await syncSessionToDb(req);
   res.json({
     success: true,
     user: user,
@@ -270,7 +303,7 @@ app.post('/api/buy-xp', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/unlock-region', requireAuth, (req, res) => {
+app.post('/api/unlock-region', requireAuth, async (req, res) => {
   const user = req.session.user;
   const cost = 150;
   if (user.coins < cost) {
@@ -288,7 +321,7 @@ app.post('/api/unlock-region', requireAuth, (req, res) => {
     coins: -cost,
     xp: 0
   });
-  
+  await syncSessionToDb(req);
   res.json({
     success: true,
     user: user,
@@ -296,7 +329,7 @@ app.post('/api/unlock-region', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/buy-title', requireAuth, (req, res) => {
+app.post('/api/buy-title', requireAuth, async (req, res) => {
   const { title } = req.body;
   const user = req.session.user;
   const cost = 40;
@@ -316,7 +349,7 @@ app.post('/api/buy-title', requireAuth, (req, res) => {
     coins: -cost,
     xp: 0
   });
-  
+  await syncSessionToDb(req);
   res.json({
     success: true,
     user: user,
@@ -324,15 +357,74 @@ app.post('/api/buy-title', requireAuth, (req, res) => {
   });
 });
 
-app.get('/', requireAuth, (req, res) => {
-  res.render('dashboard', { 
-    user: req.session.user,
-    habits: HABITS,
-    upgrades: UPGRADES
-  });
+app.get('/', async (req, res) => {
+  // If session is already loaded, proceed to dashboard or redirect to scan onboarding
+  if (req.session && req.session.user) {
+    if (!req.session.user.scanCompleted) {
+      return res.redirect('/scan');
+    }
+    return res.render('dashboard', { 
+      user: req.session.user,
+      habits: HABITS,
+      upgrades: UPGRADES
+    });
+  }
+
+  // Fallback to JWT in cookie
+  const token = req.cookies?.token;
+  if (token) {
+    try {
+      const jwt = require('jsonwebtoken');
+      const User = require('./models/User');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
+      
+      if (user) {
+        // Hydrate session from MongoDB user record
+        req.session.user = {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          level: user.level || 1,
+          xp: user.xp || 0,
+          coins: user.coins !== undefined ? user.coins : 100,
+          carbonOffset: user.carbonOffset !== undefined ? user.carbonOffset : 0,
+          waterSaved: user.waterSaved || 0,
+          energyConserved: user.energyConserved || 0,
+          rank: user.rank || 'Seed Guardian',
+          netZeroUnlocked: user.netZeroUnlocked || false,
+          customTitleBought: user.customTitleBought || false,
+          scanCompleted: user.scanCompleted || false,
+          island: user.island || {
+            trees: 1,
+            flowers: 1,
+            waterCleanliness: 25,
+            meadowGreenness: 25,
+            solarPanels: 0,
+            windTurbines: 0
+          },
+          history: user.history || []
+        };
+        
+        if (!req.session.user.scanCompleted) {
+          return res.redirect('/scan');
+        }
+        return res.render('dashboard', { 
+          user: req.session.user,
+          habits: HABITS,
+          upgrades: UPGRADES
+        });
+      }
+    } catch (err) {
+      console.warn('⚠️  JWT Session hydration failed:', err.message);
+    }
+  }
+
+  // If not authenticated, render login page directly on the root URL
+  res.render('login', { error: null });
 });
 
-app.post('/api/log-habit', requireAuth, (req, res) => {
+app.post('/api/log-habit', requireAuth, async (req, res) => {
   const { habitId } = req.body;
   const habit = HABITS[habitId];
 
@@ -376,6 +468,8 @@ app.post('/api/log-habit', requireAuth, (req, res) => {
   const commentIndex = Math.floor(Math.random() * AI_RESPONSES.length);
   const aiMessage = AI_RESPONSES[commentIndex];
 
+  await syncSessionToDb(req);
+
   res.json({
     success: true,
     user: user,
@@ -385,7 +479,7 @@ app.post('/api/log-habit', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/buy-upgrade', requireAuth, (req, res) => {
+app.post('/api/buy-upgrade', requireAuth, async (req, res) => {
   const { upgradeId } = req.body;
   const upgrade = UPGRADES[upgradeId];
 
@@ -414,6 +508,8 @@ app.post('/api/buy-upgrade', requireAuth, (req, res) => {
     coins: -upgrade.cost,
     xp: 0
   });
+
+  await syncSessionToDb(req);
 
   res.json({
     success: true,
@@ -459,7 +555,7 @@ app.post('/api/coach-chat', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/award-coins', requireAuth, (req, res) => {
+app.post('/api/award-coins', requireAuth, async (req, res) => {
   const { coins, xp } = req.body;
   const user = req.session.user;
 
@@ -483,6 +579,8 @@ app.post('/api/award-coins', requireAuth, (req, res) => {
     
     const leveledUp = user.level > oldLevel;
     
+    await syncSessionToDb(req);
+
     res.json({
       success: true,
       user: user,
@@ -491,6 +589,8 @@ app.post('/api/award-coins', requireAuth, (req, res) => {
     });
     return;
   }
+
+  await syncSessionToDb(req);
 
   res.json({
     success: true,

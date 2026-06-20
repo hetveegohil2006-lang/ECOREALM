@@ -651,6 +651,10 @@ body {
   border: 1px solid var(--accent-cyan);
   background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 80%);
   box-shadow: 0 0 10px var(--accent-cyan-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .hud-user-name {

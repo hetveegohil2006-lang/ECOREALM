@@ -50,7 +50,11 @@
 
     <!-- User stats details and Actions -->
     <div class="hud-user-profile">
-      <div class="hud-user-avatar"></div>
+      <div class="hud-user-avatar" style="<%= user.avatar ? `background-image: url('${user.avatar}'); background-size: cover; background-position: center;` : '' %>">
+        <% if (!user.avatar) { %>
+          <i class="fa-solid fa-user-shield" style="font-size: 0.8rem; color: var(--accent-cyan);"></i>
+        <% } %>
+      </div>
       <div style="text-align: right; display: flex; flex-direction: column;">
         <span class="hud-user-name" id="hud-username-val"><%= user.username %></span>
         <span class="hud-user-rank" id="rank-val"><%= user.rank %></span>

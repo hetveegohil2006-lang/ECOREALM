@@ -113,7 +113,7 @@
           <span>SECURE EXTERNAL CREDENTIAL LINK</span>
         </div>
 
-        <button type="button" class="btn-hud-action secondary-btn" onclick="googleOAuth()">
+        <button type="button" class="btn-hud-action secondary-btn" id="google-oauth-btn" onclick="googleOAuth()">
           <span class="btn-text"><i class="fa-brands fa-google"></i> Continue with Google Link</span>
         </button>
       </form>
@@ -343,7 +343,10 @@
   }
 
   function googleOAuth() {
-    alert("Establishing Google Authentication Link... (Simulated)");
+    const modal = document.getElementById('oauth-modal');
+    modal.style.display = 'flex';
+    document.getElementById('oauth-close-btn').onclick = () => { modal.style.display = 'none'; };
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
   }
 
   // Submit Handler
@@ -437,5 +440,17 @@
     initThree();
   });
 </script>
+
+<!-- Google OAuth HUD Modal (top-level full-screen overlay) -->
+<div id="oauth-modal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div style="background:linear-gradient(135deg,#0d1f1a,#0a1628); border:1px solid #5cffb3; border-radius:14px; padding:2.5rem 3rem; max-width:440px; width:90%; text-align:center; box-shadow:0 0 60px rgba(92,255,179,0.25), 0 0 20px rgba(83,232,255,0.1);">
+    <div style="font-family:'Orbitron',monospace; color:#5cffb3; font-size:0.6rem; letter-spacing:4px; margin-bottom:1.2rem; opacity:0.7;">// SECURE EXTERNAL CREDENTIAL LINK</div>
+    <div style="font-size:3rem; margin-bottom:1rem;"><i class="fa-brands fa-google" style="color:#5cffb3; filter:drop-shadow(0 0 10px rgba(92,255,179,0.6));"></i></div>
+    <h3 style="font-family:'Orbitron',monospace; color:#ffffff; font-size:1.1rem; margin-bottom:0.8rem; letter-spacing:2px;">GOOGLE OAUTH OFFLINE</h3>
+    <div style="width:60px; height:2px; background:linear-gradient(90deg,#5cffb3,#53e8ff); margin:0 auto 1.2rem;"></div>
+    <p style="color:#8ba3a0; font-size:0.82rem; line-height:1.7; margin-bottom:1.8rem;">Google Authentication is currently being configured for this command node.<br><br>Please use your <span style="color:#53e8ff; font-weight:600;">Guardian Callsign &amp; password</span> credentials to register.</p>
+    <button id="oauth-close-btn" style="background:linear-gradient(90deg,#5cffb3,#53e8ff); border:none; border-radius:6px; padding:0.65rem 2rem; font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:#0a1628; cursor:pointer; letter-spacing:1px; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">UNDERSTOOD &#8212; CLOSE</button>
+  </div>
+</div>
 
 <%- include('partials/footer') %>
