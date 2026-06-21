@@ -764,6 +764,107 @@
   window.customTitleBought = <%= user.customTitleBought %>;
 </script>
 
+<!-- Supabase Realtime Integration -->
+<script>
+  if (window.supabaseClient) {
+    const currentUserId = "<%= user._id || user.id %>";
+
+    // 1. Realtime profile changes (eco points, level, XP, etc.)
+    window.supabaseClient
+      .channel('profile-realtime')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: 'id=eq.' + currentUserId
+      }, payload => {
+        console.log('⚡ Realtime Profile Update:', payload.new);
+        const updated = payload.new;
+        
+        // Sync DOM stats
+        const lvl = document.getElementById('level-val');
+        const coin = document.getElementById('coin-val');
+        const carb = document.getElementById('carbon-val');
+        const water = document.getElementById('water-val');
+        const energy = document.getElementById('energy-val');
+
+        if (lvl) lvl.textContent = updated.level;
+        if (coin) coin.textContent = updated.eco_points;
+        if (carb) carb.textContent = Number(updated.carbon_offset).toFixed(1);
+        if (water) water.textContent = Number(updated.water_saved).toFixed(0);
+        if (energy) energy.textContent = Number(updated.energy_conserved).toFixed(1);
+
+        // Sync Profile Tab elements
+        const pCoins = document.getElementById('profile-stat-coins');
+        const pLevel = document.getElementById('profile-stat-level');
+        const pCarbon = document.getElementById('profile-impact-carbon');
+        const pWater = document.getElementById('profile-impact-water');
+        const pEnergy = document.getElementById('profile-impact-energy');
+
+        if (pCoins) pCoins.textContent = updated.eco_points;
+        if (pLevel) pLevel.textContent = updated.level;
+        if (pCarbon) pCarbon.textContent = Number(updated.carbon_offset).toFixed(1);
+        if (pWater) pWater.textContent = Number(updated.water_saved).toFixed(0);
+        if (pEnergy) pEnergy.textContent = Number(updated.energy_conserved).toFixed(1);
+
+        // Sync XP Bar
+        const xpVal = document.getElementById('xp-val');
+        const xpBar = document.getElementById('xp-bar');
+        if (xpVal && xpBar) {
+          const progress = updated.xp % 100;
+          xpVal.textContent = progress;
+          xpBar.style.width = progress + '%';
+        }
+      })
+      .subscribe();
+
+    // 2. Realtime community post insertion
+    window.supabaseClient
+      .channel('community-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'community_posts'
+      }, async payload => {
+        console.log('⚡ Realtime New Post:', payload.new);
+        const feed = document.getElementById('community-feed');
+        if (feed) {
+          const { data: author } = await window.supabaseClient
+            .from('profiles')
+            .select('username')
+            .eq('id', payload.new.user_id)
+            .single();
+
+          const item = document.createElement('div');
+          item.className = 'feed-item alert';
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          item.innerHTML = `<span class="feed-timestamp">${timeStr}</span> Commander ${author?.username || 'Eco'} published new update: [${payload.new.title}]`;
+          feed.insertBefore(item, feed.firstChild);
+          if (feed.children.length > 8) feed.removeChild(feed.lastChild);
+        }
+      })
+      .subscribe();
+
+    // 3. Realtime leaderboard updates
+    window.supabaseClient
+      .channel('leaderboard-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles'
+      }, payload => {
+        console.log('⚡ Leaderboard refresh needed');
+        if (typeof renderLeaderboard === 'function') {
+          const globalBtn = document.querySelector('.btn-switch-hud.active');
+          const type = (globalBtn && globalBtn.textContent.toLowerCase().includes('friends')) ? 'friends' : 'global';
+          renderLeaderboard(type);
+        }
+      })
+      .subscribe();
+  }
+</script>
+
 <script src="/js/realm-3d.js"></script>
 <script src="/js/dashboard.js"></script>
 

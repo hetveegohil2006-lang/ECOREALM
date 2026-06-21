@@ -1,5 +1,25 @@
-const Notification = require('../models/Notification');
+const { supabase } = require('../lib/supabase');
 const asyncHandler = require('../middleware/asyncHandler');
+
+// Map database notification with profile join to frontend expected format
+const formatNotification = (n) => {
+  if (!n) return null;
+  return {
+    _id: n.id,
+    id: n.id,
+    recipient: n.recipient,
+    title: n.title,
+    message: n.message,
+    isRead: n.is_read,
+    readAt: n.read_at,
+    createdAt: n.created_at,
+    sender: n.sender_profile ? {
+      _id: n.sender_profile.id,
+      username: n.sender_profile.username,
+      avatar: n.sender_profile.avatar
+    } : null
+  };
+};
 
 // @desc    Get user notifications
 // @route   GET /api/notifications
@@ -7,26 +27,30 @@ const asyncHandler = require('../middleware/asyncHandler');
 exports.getNotifications = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 20;
-  const skip = (page - 1) * limit;
 
-  const notifications = await Notification.find({ recipient: req.user._id })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .populate('sender', 'username avatar');
+  const { data: notifications, count, error } = await supabase
+    .from('notifications')
+    .select('*, sender_profile:profiles!notifications_sender_fkey(*)', { count: 'exact' })
+    .eq('recipient', req.user.id)
+    .order('created_at', { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
 
-  const total = await Notification.countDocuments({ recipient: req.user._id });
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  const formatted = (notifications || []).map(formatNotification);
 
   res.status(200).json({
     success: true,
-    count: notifications.length,
+    count: formatted.length,
     pagination: {
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
-      total
+      totalPages: Math.ceil((count || 0) / limit),
+      total: count || 0
     },
-    data: notifications
+    data: formatted
   });
 });
 
@@ -34,32 +58,47 @@ exports.getNotifications = asyncHandler(async (req, res) => {
 // @route   PUT /api/notifications/:id/read
 // @access  Private
 exports.markAsRead = asyncHandler(async (req, res) => {
-  let notification = await Notification.findById(req.params.id);
+  const { data: notification, error: getErr } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
 
-  if (!notification) {
+  if (getErr || !notification) {
     return res.status(404).json({ success: false, error: 'Notification not found.' });
   }
 
-  // Make sure notification belongs to user
-  if (notification.recipient.toString() !== req.user._id.toString()) {
+  if (notification.recipient !== req.user.id) {
     return res.status(401).json({ success: false, error: 'Not authorized to access this notification.' });
   }
 
-  notification.isRead = true;
-  notification.readAt = Date.now();
-  await notification.save();
+  const { data: updated, error } = await supabase
+    .from('notifications')
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq('id', req.params.id)
+    .select()
+    .single();
 
-  res.status(200).json({ success: true, data: notification });
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  res.status(200).json({ success: true, data: formatNotification(updated) });
 });
 
 // @desc    Mark all notifications as read
 // @route   PUT /api/notifications/read-all
 // @access  Private
 exports.markAllAsRead = asyncHandler(async (req, res) => {
-  await Notification.updateMany(
-    { recipient: req.user._id, isRead: false },
-    { $set: { isRead: true, readAt: Date.now() } }
-  );
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq('recipient', req.user.id)
+    .eq('is_read', false);
+
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
 
   res.status(200).json({ success: true, message: 'All notifications marked as read.' });
 });
@@ -68,18 +107,28 @@ exports.markAllAsRead = asyncHandler(async (req, res) => {
 // @route   DELETE /api/notifications/:id
 // @access  Private
 exports.deleteNotification = asyncHandler(async (req, res) => {
-  const notification = await Notification.findById(req.params.id);
+  const { data: notification, error: getErr } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
 
-  if (!notification) {
+  if (getErr || !notification) {
     return res.status(404).json({ success: false, error: 'Notification not found.' });
   }
 
-  // Make sure notification belongs to user
-  if (notification.recipient.toString() !== req.user._id.toString()) {
+  if (notification.recipient !== req.user.id) {
     return res.status(401).json({ success: false, error: 'Not authorized.' });
   }
 
-  await notification.deleteOne();
+  const { error: deleteErr } = await supabase
+    .from('notifications')
+    .delete()
+    .eq('id', req.params.id);
+
+  if (deleteErr) {
+    return res.status(400).json({ success: false, error: deleteErr.message });
+  }
 
   res.status(200).json({ success: true, message: 'Notification removed.' });
 });

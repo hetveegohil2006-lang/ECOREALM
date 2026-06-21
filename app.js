@@ -10,15 +10,9 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
-// Import DB config
-const connectDB = require('./config/db');
-
 // Import middlewares
 const { apiLimiter } = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorHandler');
-
-// Import socket service
-const { initSocket } = require('./services/socketService');
 
 // Import REST API routes
 const authRoutes = require('./routes/authRoutes');
@@ -37,12 +31,7 @@ const carbonRoutes = require('./routes/carbonRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB Atlas (if URI provided)
-if (process.env.MONGO_URI) {
-  connectDB();
-} else {
-  console.warn('⚠️  MONGO_URI not defined in environmental variables. Skipping MongoDB connection. REST APIs depending on DB will fail.');
-}
+// Database connection via Supabase (client initialized in lib/supabase)
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
@@ -133,7 +122,7 @@ function checkRank(level) {
   return 'Seed Guardian';
 }
 
-// Session-based Auth Middleware for EJS views (with JWT cookie fallback/hydration)
+// Session-based Auth Middleware for EJS views (with Supabase session hydration)
 const requireAuth = async (req, res, next) => {
   // If session is already loaded, proceed
   if (req.session && req.session.user) {
@@ -144,41 +133,47 @@ const requireAuth = async (req, res, next) => {
   const token = req.cookies?.token;
   if (token) {
     try {
-      const jwt = require('jsonwebtoken');
-      const User = require('./models/User');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
+      const { supabase } = require('./lib/supabase');
+      const { data: { user: authUser }, error } = await supabase.auth.getUser(token);
       
-      if (user) {
-        // Hydrate session from MongoDB user record
-        req.session.user = {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          level: user.level || 1,
-          xp: user.xp || 0,
-          coins: user.coins !== undefined ? user.coins : 100,
-          carbonOffset: user.carbonOffset !== undefined ? user.carbonOffset : 0,
-          waterSaved: user.waterSaved || 0,
-          energyConserved: user.energyConserved || 0,
-          rank: user.rank || 'Seed Guardian',
-          netZeroUnlocked: user.netZeroUnlocked || false,
-          customTitleBought: user.customTitleBought || false,
-          scanCompleted: user.scanCompleted || false,
-          island: user.island || {
-            trees: 1,
-            flowers: 1,
-            waterCleanliness: 25,
-            meadowGreenness: 25,
-            solarPanels: 0,
-            windTurbines: 0
-          },
-          history: user.history || []
-        };
-        return next();
+      if (authUser && !error) {
+        // Hydrate session from Supabase profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+        
+        if (profile) {
+          req.session.user = {
+            _id: profile.id,
+            username: profile.username,
+            email: profile.email,
+            level: profile.level || 1,
+            xp: profile.xp || 0,
+            coins: profile.eco_points !== undefined ? profile.eco_points : 100,
+            carbonOffset: Number(profile.carbon_offset) || 0,
+            waterSaved: Number(profile.water_saved) || 0,
+            energyConserved: Number(profile.energy_conserved) || 0,
+            rank: profile.guardian_rank || 'Seed Guardian',
+            netZeroUnlocked: profile.net_zero_unlocked || false,
+            customTitleBought: profile.custom_title_bought || false,
+            scanCompleted: profile.scan_completed || false,
+            island: profile.island || {
+              trees: 1,
+              flowers: 1,
+              waterCleanliness: 25,
+              meadowGreenness: 25,
+              solarPanels: 0,
+              windTurbines: 0
+            },
+            history: profile.history || []
+          };
+          return next();
+        }
       }
     } catch (err) {
-      console.warn('⚠️  JWT Session hydration failed:', err.message);
+      console.warn('⚠️  Supabase Session hydration failed:', err.message);
     }
   }
 
@@ -186,32 +181,36 @@ const requireAuth = async (req, res, next) => {
   res.redirect('/');
 };
 
-// Sync session state back to MongoDB User record (both real and mock DB)
+// Sync session state back to Supabase profiles table
 const syncSessionToDb = async (req) => {
   if (!req.session?.user) return;
   const token = req.cookies?.token;
   if (token) {
     try {
-      const jwt = require('jsonwebtoken');
-      const User = require('./models/User');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const { supabase } = require('./lib/supabase');
+      const { data: { user: authUser } } = await supabase.auth.getUser(token);
       
-      await User.findByIdAndUpdate(decoded.id, {
-        level: req.session.user.level,
-        xp: req.session.user.xp,
-        coins: req.session.user.coins,
-        carbonOffset: req.session.user.carbonOffset,
-        waterSaved: req.session.user.waterSaved,
-        energyConserved: req.session.user.energyConserved,
-        rank: req.session.user.rank,
-        netZeroUnlocked: req.session.user.netZeroUnlocked,
-        customTitleBought: req.session.user.customTitleBought,
-        scanCompleted: req.session.user.scanCompleted,
-        island: req.session.user.island,
-        history: req.session.user.history
-      });
+      if (authUser) {
+        await supabase
+          .from('profiles')
+          .update({
+            level: req.session.user.level,
+            xp: req.session.user.xp,
+            eco_points: req.session.user.coins,
+            carbon_offset: req.session.user.carbonOffset,
+            water_saved: req.session.user.waterSaved,
+            energy_conserved: req.session.user.energyConserved,
+            guardian_rank: req.session.user.rank,
+            net_zero_unlocked: req.session.user.netZeroUnlocked,
+            custom_title_bought: req.session.user.customTitleBought,
+            scan_completed: req.session.user.scanCompleted,
+            island: req.session.user.island,
+            history: req.session.user.history
+          })
+          .eq('id', authUser.id);
+      }
     } catch (err) {
-      console.warn('⚠️ MongoDB sync failed:', err.message);
+      console.warn('⚠️ Supabase sync failed:', err.message);
     }
   }
 };
@@ -237,7 +236,14 @@ app.post('/login', (req, res) => {
   res.redirect('/scan');
 });
 
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
+  try {
+    const { supabase } = require('./lib/supabase');
+    await supabase.auth.signOut();
+  } catch (err) {
+    console.warn('⚠️ Supabase signOut failed on logout:', err.message);
+  }
+  res.clearCookie('token');
   req.session.destroy(() => {
     res.redirect('/');
   });
@@ -390,46 +396,52 @@ app.get('/', async (req, res) => {
   const token = req.cookies?.token;
   if (token) {
     try {
-      const jwt = require('jsonwebtoken');
-      const User = require('./models/User');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
+      const { supabase } = require('./lib/supabase');
+      const { data: { user: authUser }, error } = await supabase.auth.getUser(token);
       
-      if (user) {
-        // Hydrate session from MongoDB user record
-        req.session.user = {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          level: user.level || 1,
-          xp: user.xp || 0,
-          coins: user.coins !== undefined ? user.coins : 100,
-          carbonOffset: user.carbonOffset !== undefined ? user.carbonOffset : 0,
-          waterSaved: user.waterSaved || 0,
-          energyConserved: user.energyConserved || 0,
-          rank: user.rank || 'Seed Guardian',
-          netZeroUnlocked: user.netZeroUnlocked || false,
-          customTitleBought: user.customTitleBought || false,
-          scanCompleted: user.scanCompleted || false,
-          island: user.island || {
-            trees: 1,
-            flowers: 1,
-            waterCleanliness: 25,
-            meadowGreenness: 25,
-            solarPanels: 0,
-            windTurbines: 0
-          },
-          history: user.history || []
-        };
+      if (authUser && !error) {
+        // Hydrate session from Supabase profiles table
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
         
-        if (!req.session.user.scanCompleted) {
-          return res.redirect('/scan');
+        if (profile) {
+          req.session.user = {
+            _id: profile.id,
+            username: profile.username,
+            email: profile.email,
+            level: profile.level || 1,
+            xp: profile.xp || 0,
+            coins: profile.eco_points !== undefined ? profile.eco_points : 100,
+            carbonOffset: Number(profile.carbon_offset) || 0,
+            waterSaved: Number(profile.water_saved) || 0,
+            energyConserved: Number(profile.energy_conserved) || 0,
+            rank: profile.guardian_rank || 'Seed Guardian',
+            netZeroUnlocked: profile.net_zero_unlocked || false,
+            customTitleBought: profile.custom_title_bought || false,
+            scanCompleted: profile.scan_completed || false,
+            island: profile.island || {
+              trees: 1,
+              flowers: 1,
+              waterCleanliness: 25,
+              meadowGreenness: 25,
+              solarPanels: 0,
+              windTurbines: 0
+            },
+            history: profile.history || []
+          };
+          
+          if (!req.session.user.scanCompleted) {
+            return res.redirect('/scan');
+          }
+          return res.render('dashboard', { 
+            user: req.session.user,
+            habits: HABITS,
+            upgrades: UPGRADES
+          });
         }
-        return res.render('dashboard', { 
-          user: req.session.user,
-          habits: HABITS,
-          upgrades: UPGRADES
-        });
       }
     } catch (err) {
       console.warn('⚠️  JWT Session hydration failed:', err.message);
@@ -639,9 +651,10 @@ app.use(errorHandler);
 // Build HTTP Server wrapping Express App
 const server = http.createServer(app);
 
-// Bind Socket.IO Service
-initSocket(server);
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  server.listen(PORT, () => {
+    console.log(`🚀 EcoRealm OS server running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${PORT}`);
+  });
+}
 
-server.listen(PORT, () => {
-  console.log(`🚀 EcoRealm OS server running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${PORT}`);
-});
+module.exports = app;

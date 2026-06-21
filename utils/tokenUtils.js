@@ -1,27 +1,4 @@
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-
-/**
- * Generate a signed JWT access token
- * @param {string} id - User MongoDB _id
- * @returns {string} signed JWT
- */
-const generateAccessToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '7d'
-  });
-};
-
-/**
- * Generate a refresh token
- * @param {string} id - User MongoDB _id
- * @returns {string} signed refresh JWT
- */
-const generateRefreshToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '30d'
-  });
-};
 
 /**
  * Generate a secure random token (for email verification / password reset)
@@ -41,39 +18,51 @@ const sendTokenCookie = (res, token) => {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'lax'
   };
   res.cookie('token', token, options);
 };
 
 /**
- * Send token response with user data
+ * Send token response with user data from Supabase profile
  */
-const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+const sendTokenResponse = (profile, session, statusCode, res, message = 'Success') => {
+  const accessToken = session?.access_token || '';
+  const refreshToken = session?.refresh_token || '';
 
-  sendTokenCookie(res, accessToken);
-
-  // Remove sensitive fields
-  const userData = user.toObject ? user.toObject() : { ...user };
-  delete userData.password;
-  delete userData.refreshTokens;
-  delete userData.resetPasswordToken;
-  delete userData.emailVerificationToken;
+  if (accessToken) {
+    sendTokenCookie(res, accessToken);
+  }
 
   res.status(statusCode).json({
     success: true,
     message,
     accessToken,
     refreshToken,
-    user: userData
+    user: {
+      _id: profile.id,
+      id: profile.id,
+      username: profile.username,
+      email: profile.email,
+      avatar: profile.avatar,
+      level: profile.level,
+      xp: profile.xp,
+      coins: profile.eco_points,
+      ecoPoints: profile.eco_points,
+      carbonOffset: Number(profile.carbon_offset) || 0,
+      waterSaved: Number(profile.water_saved) || 0,
+      energyConserved: Number(profile.energy_conserved) || 0,
+      rank: profile.guardian_rank,
+      netZeroUnlocked: profile.net_zero_unlocked,
+      customTitleBought: profile.custom_title_bought,
+      scanCompleted: profile.scan_completed,
+      island: profile.island,
+      history: profile.history
+    }
   });
 };
 
 module.exports = {
-  generateAccessToken,
-  generateRefreshToken,
   generateSecureToken,
   sendTokenCookie,
   sendTokenResponse

@@ -1,4 +1,4 @@
-const DiagnosticResult = require('../models/DiagnosticResult');
+const { supabase } = require('../lib/supabase');
 const asyncHandler = require('../middleware/asyncHandler');
 const { awardXP } = require('./userController');
 const { generateRecommendations } = require('../services/coachService');
@@ -23,7 +23,7 @@ function classifyScore(score) {
   return { rating: 'Critical', classification: 'Impact Override' };
 }
 
-// @desc    Start diagnostic (just initializes session context, returns categories)
+// @desc    Start diagnostic (just initializes session context)
 // @route   POST /api/diagnostic/start
 // @access  Private
 exports.startDiagnostic = asyncHandler(async (req, res) => {
@@ -78,25 +78,45 @@ exports.submitDiagnostic = asyncHandler(async (req, res) => {
     ];
   }
 
-  const result = await DiagnosticResult.create({
-    user: req.user._id,
-    answers,
-    scores,
-    totalCarbonScore: parseFloat(totalCarbonScore.toFixed(2)),
-    sustainabilityRating: rating,
-    guardianClassification: classification,
-    recommendations
-  });
+  // Save to assessments table
+  const { data: result, error } = await supabase
+    .from('assessments')
+    .insert({
+      user_id: req.user.id,
+      transportation: scores.transportation,
+      food: scores.food,
+      energy: scores.energy,
+      waste: scores.waste,
+      water: scores.water,
+      shopping: scores.shopping,
+      carbon_score: parseFloat(totalCarbonScore.toFixed(2))
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  // Update profile to mark scan as completed and award XP
+  await supabase
+    .from('profiles')
+    .update({
+      scan_completed: true,
+      carbon_score: parseFloat(totalCarbonScore.toFixed(2)),
+      guardian_rank: classification
+    })
+    .eq('id', req.user.id);
 
   // Award XP for completing diagnostic
-  await awardXP(req.user._id, 100, 50);
+  const awardResult = await awardXP(req.user.id, 100, 50);
 
   res.status(201).json({
     success: true,
     message: 'Diagnostic complete. Guardian profile generated.',
     result: {
-      id: result._id,
-      totalCarbonScore: result.totalCarbonScore,
+      id: result.id,
+      totalCarbonScore: result.carbon_score,
       sustainabilityRating: rating,
       guardianClassification: classification,
       comparedToAverage: `${comparedToAverage}%`,
@@ -110,15 +130,58 @@ exports.submitDiagnostic = asyncHandler(async (req, res) => {
 // @route   GET /api/diagnostic/result
 // @access  Private
 exports.getDiagnosticResult = asyncHandler(async (req, res) => {
-  const result = await DiagnosticResult.findOne({ user: req.user._id }).sort({ createdAt: -1 });
-  if (!result) return res.status(404).json({ success: false, error: 'No diagnostic on record. Run a scan first.' });
-  res.status(200).json({ success: true, result });
+  const { data: result, error } = await supabase
+    .from('assessments')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !result) {
+    return res.status(404).json({ success: false, error: 'No diagnostic on record. Run a scan first.' });
+  }
+
+  // Format to match old model structure
+  const formatted = {
+    _id: result.id,
+    user: result.user_id,
+    totalCarbonScore: result.carbon_score,
+    answers: {
+      transportation: result.transportation,
+      food: result.food,
+      energy: result.energy,
+      waste: result.waste,
+      water: result.water,
+      shopping: result.shopping
+    },
+    createdAt: result.created_at
+  };
+
+  res.status(200).json({ success: true, result: formatted });
 });
 
 // @desc    Get all diagnostic history
 // @route   GET /api/diagnostic/history
 // @access  Private
 exports.getDiagnosticHistory = asyncHandler(async (req, res) => {
-  const results = await DiagnosticResult.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(10);
-  res.status(200).json({ success: true, count: results.length, results });
+  const { data: results, error } = await supabase
+    .from('assessments')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  const formatted = results.map(r => ({
+    _id: r.id,
+    user: r.user_id,
+    totalCarbonScore: r.carbon_score,
+    createdAt: r.created_at
+  }));
+
+  res.status(200).json({ success: true, count: formatted.length, results: formatted });
 });

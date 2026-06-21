@@ -1,4 +1,4 @@
-const Challenge = require('../models/Challenge');
+const { supabase } = require('../lib/supabase');
 const asyncHandler = require('../middleware/asyncHandler');
 const { awardXP } = require('./userController');
 
@@ -12,9 +12,27 @@ const SEED_CHALLENGES = [
 ];
 
 const seedChallenges = async () => {
-  const count = await Challenge.countDocuments();
-  if (count === 0) {
-    await Challenge.insertMany(SEED_CHALLENGES);
+  const { count, error } = await supabase
+    .from('challenges')
+    .select('*', { count: 'exact', head: true });
+
+  if (!error && count === 0) {
+    const formatted = SEED_CHALLENGES.map(c => ({
+      title: c.title,
+      description: c.description,
+      type: c.type || 'individual',
+      category: c.category || 'general',
+      difficulty: c.difficulty || 'medium',
+      xp_reward: c.xpReward,
+      coin_reward: c.coinReward,
+      badge_reward: c.badgeReward || null,
+      goal: c.goal,
+      unit: c.unit || 'actions',
+      icon: c.icon || '🏆',
+      is_active: true
+    }));
+
+    await supabase.from('challenges').insert(formatted);
     console.log('✅ Challenges seeded.');
   }
 };
@@ -24,58 +42,168 @@ const seedChallenges = async () => {
 // @access  Private
 exports.getChallenges = asyncHandler(async (req, res) => {
   await seedChallenges();
-  const challenges = await Challenge.find({ isActive: true }).sort({ xpReward: -1 });
-  res.status(200).json({ success: true, count: challenges.length, challenges });
+  const { data: challenges, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('is_active', true)
+    .order('xp_reward', { ascending: false });
+
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  // Format to match compatibility expectations
+  const compatChallenges = (challenges || []).map(c => ({
+    _id: c.id,
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    type: c.type,
+    category: c.category,
+    difficulty: c.difficulty,
+    xpReward: c.xp_reward,
+    coinReward: c.coin_reward,
+    badgeReward: c.badge_reward,
+    goal: Number(c.goal),
+    unit: c.unit,
+    icon: c.icon,
+    isActive: c.is_active,
+    participants: [] // Empty array for compatibility
+  }));
+
+  res.status(200).json({ success: true, count: compatChallenges.length, challenges: compatChallenges });
 });
 
 // @desc    Join a challenge
 // @route   POST /api/challenges/:id/join
 // @access  Private
 exports.joinChallenge = asyncHandler(async (req, res) => {
-  const challenge = await Challenge.findById(req.params.id);
-  if (!challenge) return res.status(404).json({ success: false, error: 'Challenge not found.' });
+  const challengeId = req.params.id;
 
-  const alreadyJoined = challenge.participants.some(p => p.user.toString() === req.user._id.toString());
-  if (alreadyJoined) return res.status(400).json({ success: false, error: 'Already participating in this challenge.' });
+  const { data: challenge, error: challengeErr } = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('id', challengeId)
+    .single();
 
-  challenge.participants.push({ user: req.user._id, progress: 0 });
-  await challenge.save();
+  if (challengeErr || !challenge) {
+    return res.status(404).json({ success: false, error: 'Challenge not found.' });
+  }
 
-  res.status(200).json({ success: true, message: `Joined challenge: "${challenge.title}"!`, challenge });
+  const { data: existing, error: existErr } = await supabase
+    .from('user_challenges')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .eq('challenge_id', challengeId)
+    .maybeSingle();
+
+  if (existing) {
+    return res.status(400).json({ success: false, error: 'Already participating in this challenge.' });
+  }
+
+  const { error: joinErr } = await supabase
+    .from('user_challenges')
+    .insert({
+      user_id: req.user.id,
+      challenge_id: challengeId,
+      progress: 0
+    });
+
+  if (joinErr) {
+    return res.status(400).json({ success: false, error: joinErr.message });
+  }
+
+  const compatChallenge = {
+    _id: challenge.id,
+    id: challenge.id,
+    title: challenge.title,
+    description: challenge.description,
+    type: challenge.type,
+    category: challenge.category,
+    difficulty: challenge.difficulty,
+    xpReward: challenge.xp_reward,
+    coinReward: challenge.coin_reward,
+    badgeReward: challenge.badge_reward,
+    goal: Number(challenge.goal),
+    unit: challenge.unit,
+    icon: challenge.icon,
+    isActive: challenge.is_active,
+    participants: [{ user: req.user.id, progress: 0 }]
+  };
+
+  res.status(200).json({
+    success: true,
+    message: `Joined challenge: "${challenge.title}"!`,
+    challenge: compatChallenge
+  });
 });
 
 // @desc    Update challenge progress
 // @route   PUT /api/challenges/:id/progress
 // @access  Private
 exports.updateProgress = asyncHandler(async (req, res) => {
-  const challenge = await Challenge.findById(req.params.id);
-  if (!challenge) return res.status(404).json({ success: false, error: 'Challenge not found.' });
+  const challengeId = req.params.id;
 
-  const participant = challenge.participants.find(p => p.user.toString() === req.user._id.toString());
-  if (!participant) return res.status(400).json({ success: false, error: 'You have not joined this challenge.' });
-  if (participant.completedAt) return res.status(400).json({ success: false, error: 'Challenge already completed.' });
+  const { data: challenge, error: challengeErr } = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('id', challengeId)
+    .single();
+
+  if (challengeErr || !challenge) {
+    return res.status(404).json({ success: false, error: 'Challenge not found.' });
+  }
+
+  const { data: participant, error: partErr } = await supabase
+    .from('user_challenges')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .eq('challenge_id', challengeId)
+    .maybeSingle();
+
+  if (partErr || !participant) {
+    return res.status(400).json({ success: false, error: 'You have not joined this challenge.' });
+  }
+
+  if (participant.completed_at) {
+    return res.status(400).json({ success: false, error: 'Challenge already completed.' });
+  }
 
   const increment = parseFloat(req.body.increment) || 1;
-  participant.progress = Math.min(challenge.goal, participant.progress + increment);
+  const currentProgress = Number(participant.progress) || 0;
+  const newProgress = Math.min(Number(challenge.goal), currentProgress + increment);
+  const goal = Number(challenge.goal);
 
   let completed = false;
   let result = null;
-  if (participant.progress >= challenge.goal) {
-    participant.completedAt = new Date();
+  let completedAt = null;
+
+  if (newProgress >= goal) {
+    completedAt = new Date().toISOString();
     completed = true;
-    result = await awardXP(req.user._id, challenge.xpReward, challenge.coinReward);
+    result = await awardXP(req.user.id, challenge.xp_reward, challenge.coin_reward);
   }
 
-  await challenge.save();
+  const { error: updateErr } = await supabase
+    .from('user_challenges')
+    .update({
+      progress: newProgress,
+      completed_at: completedAt
+    })
+    .eq('id', participant.id);
+
+  if (updateErr) {
+    return res.status(400).json({ success: false, error: updateErr.message });
+  }
 
   res.status(200).json({
     success: true,
-    progress: participant.progress,
-    goal: challenge.goal,
-    percent: Math.round((participant.progress / challenge.goal) * 100),
+    progress: newProgress,
+    goal: goal,
+    percent: Math.round((newProgress / goal) * 100),
     completed,
     ...(completed && {
-      message: `🏆 Challenge complete: "${challenge.title}" — +${challenge.xpReward} XP!`,
+      message: `🏆 Challenge complete: "${challenge.title}" — +${challenge.xp_reward} XP!`,
       leveledUp: result?.leveledUp,
       newBadges: result?.newBadges
     })
@@ -87,10 +215,41 @@ exports.updateProgress = asyncHandler(async (req, res) => {
 // @access  Private
 exports.getMyChallenges = asyncHandler(async (req, res) => {
   await seedChallenges();
-  const challenges = await Challenge.find({ 'participants.user': req.user._id, isActive: true });
-  const withProgress = challenges.map(c => {
-    const p = c.participants.find(x => x.user.toString() === req.user._id.toString());
-    return { ...c.toObject(), myProgress: p?.progress || 0, myCompleted: !!p?.completedAt };
-  });
+  
+  const { data: joinedChallenges, error } = await supabase
+    .from('user_challenges')
+    .select('*, challenges(*)')
+    .eq('user_id', req.user.id);
+
+  if (error) {
+    return res.status(400).json({ success: false, error: error.message });
+  }
+
+  // Filter and map the active challenges
+  const withProgress = (joinedChallenges || [])
+    .filter(uc => uc.challenges && uc.challenges.is_active)
+    .map(uc => {
+      const c = uc.challenges;
+      return {
+        _id: c.id,
+        id: c.id,
+        title: c.title,
+        description: c.description,
+        type: c.type,
+        category: c.category,
+        difficulty: c.difficulty,
+        xpReward: c.xp_reward,
+        coinReward: c.coin_reward,
+        badgeReward: c.badge_reward,
+        goal: Number(c.goal),
+        unit: c.unit,
+        icon: c.icon,
+        isActive: c.is_active,
+        myProgress: Number(uc.progress),
+        myCompleted: !!uc.completed_at,
+        participants: [] // compatible array
+      };
+    });
+
   res.status(200).json({ success: true, count: withProgress.length, challenges: withProgress });
 });
