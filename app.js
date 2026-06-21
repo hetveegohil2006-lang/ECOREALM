@@ -51,7 +51,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configure session
+const MemoryStore = require('memorystore')(session);
+
 app.use(session({
+  store: new MemoryStore({
+    checkPeriod: 24 * 60 * 60 * 1000 // prune expired entries every 24h
+  }),
   secret: process.env.SESSION_SECRET || 'ecorealm-super-secret-key-12345',
   resave: false,
   saveUninitialized: true,
