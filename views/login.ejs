@@ -171,7 +171,13 @@
         </form>
 
         <div class="console-footer">
-          <span>Not yet synced in mainframe? <a href="/register" class="link-cyan">Register Callsign</a></span>
+          <span>Not yet synced in mainframe?</span><br>
+          <div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+            <a href="/register" class="link-cyan" onclick="console.log('Register button clicked'); navigateSpa(event, '/register');">Register</a>
+            <a href="/register" class="link-cyan" onclick="console.log('Sign Up button clicked'); navigateSpa(event, '/register');">Sign Up</a>
+            <a href="/register" class="link-cyan" onclick="console.log('Join EcoREALM button clicked'); navigateSpa(event, '/register');">Join EcoREALM</a>
+            <a href="/register" class="link-cyan" onclick="console.log('Start Your Journey button clicked'); navigateSpa(event, '/register');">Start Your Journey</a>
+          </div>
         </div>
       </div>
 
@@ -215,6 +221,60 @@
         <button class="btn-hud-action primary-btn green-theme" style="margin-top: 15px;" onclick="goToScan()">
           <span class="btn-text">Initialize Diagnostic Scan <i class="fa-solid fa-circle-play"></i></span>
         </button>
+      </div>
+
+      <!-- REGISTRATION CONSOLE PANEL -->
+      <div class="registration-hud-card glass-panel" id="register-form-card" style="display: none;">
+        <div class="hud-card-corners"></div>
+        
+        <div class="console-header">
+          <h1 class="console-title">Join the Restoration</h1>
+          <p class="console-subtitle">Your first step toward healing the planet.</p>
+        </div>
+
+        <div class="error-banner" id="register-error-banner" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span id="register-error-text">DEVIATION DETECTED</span><br>
+          <button id="fallback-continue-btn" style="display: none; margin-top: 10px;" class="btn-hud-action secondary-btn" onclick="fallbackRegistration()">
+            <span class="btn-text">Continue Registration</span>
+          </button>
+        </div>
+
+        <form id="register-form" autocomplete="off">
+          <div class="form-grid">
+            <div class="input-hud-group">
+              <label for="reg-username"><i class="fa-solid fa-user-shield"></i> Guardian Name</label>
+              <input type="text" id="reg-username" name="username" class="hud-input" placeholder="e.g. Commander Eco" required>
+              <span class="input-line-glow"></span>
+            </div>
+
+            <div class="input-hud-group">
+              <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email</label>
+              <input type="email" id="reg-email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org" required>
+              <span class="input-line-glow"></span>
+            </div>
+
+            <div class="input-hud-group">
+              <label for="reg-password"><i class="fa-solid fa-lock"></i> Password</label>
+              <input type="password" id="reg-password" name="password" class="hud-input" placeholder="Minimum 6 characters" required>
+              <span class="input-line-glow"></span>
+            </div>
+
+            <div class="input-hud-group">
+              <label for="reg-confirmPassword"><i class="fa-solid fa-shield-halved"></i> Confirm Password</label>
+              <input type="password" id="reg-confirmPassword" name="confirmPassword" class="hud-input" placeholder="Confirm password" required>
+              <span class="input-line-glow"></span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-hud-action primary-btn" id="reg-submit-btn">
+            <span class="btn-glow-layer"></span>
+            <span class="btn-text"><i class="fa-solid fa-rocket"></i> Create Guardian Account</span>
+          </button>
+        </form>
+
+        <div class="console-footer">
+          <span>Already verified on the mainframe? <a href="/" class="link-cyan" onclick="navigateSpa(event, '/')">Synchronize Neural Profile</a></span>
+        </div>
       </div>
     </main>
 
@@ -585,6 +645,72 @@
         playSound(180, 'sawtooth', 0.3, 0.08); // Error synth tone
       }
     });
+    function navigateSpa(e, url) {
+      e.preventDefault();
+      window.history.pushState({}, '', url);
+      
+      if (url === '/register') {
+        document.getElementById('login-form-card').style.display = 'none';
+        document.getElementById('success-stats-panel').style.display = 'none';
+        document.getElementById('register-form-card').style.display = 'block';
+      } else {
+        document.getElementById('register-form-card').style.display = 'none';
+        document.getElementById('success-stats-panel').style.display = 'none';
+        document.getElementById('login-form-card').style.display = 'block';
+      }
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+      const confirmPassword = document.getElementById('reg-confirmPassword').value;
+
+      const errorBanner = document.getElementById('register-error-banner');
+      const errorText = document.getElementById('register-error-text');
+      const fallbackBtn = document.getElementById('fallback-continue-btn');
+
+      if (password !== confirmPassword) {
+        errorText.textContent = "DECRYPTION KEYS DO NOT MATCH. RETRY.";
+        errorBanner.style.display = 'block';
+        fallbackBtn.style.display = 'none';
+        return;
+      }
+
+      errorBanner.style.display = 'none';
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> TRANSMITTING CREDENTIALS...`;
+
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Mission authorization failed.");
+        }
+
+        window.location.href = '/diagnostic-scan';
+
+      } catch (err) {
+        btn.disabled = false;
+        btn.querySelector('.btn-text').innerHTML = `<i class="fa-solid fa-rocket"></i> Create Guardian Account`;
+        errorText.textContent = "Unable to initialize system. Continue manually.";
+        errorBanner.style.display = 'block';
+        fallbackBtn.style.display = 'inline-block';
+      }
+    });
+
+    function fallbackRegistration() {
+      window.location.href = '/diagnostic-scan';
+    }
   </script>
 
   <!-- Google OAuth HUD Modal (top-level full-screen overlay) -->

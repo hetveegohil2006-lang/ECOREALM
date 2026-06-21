@@ -80,25 +80,25 @@
       <form id="register-form" autocomplete="off">
         <div class="form-grid">
           <div class="input-hud-group">
-            <label for="username"><i class="fa-solid fa-user-shield"></i> Guardian Callsign / Name</label>
+            <label for="username"><i class="fa-solid fa-user-shield"></i> Guardian Name</label>
             <input type="text" id="username" name="username" class="hud-input" placeholder="e.g. Commander Eco" required>
             <span class="input-line-glow"></span>
           </div>
 
           <div class="input-hud-group">
-            <label for="email"><i class="fa-solid fa-envelope"></i> Core Comms Email</label>
+            <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
             <input type="email" id="email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org" required>
             <span class="input-line-glow"></span>
           </div>
 
           <div class="input-hud-group">
-            <label for="password"><i class="fa-solid fa-lock"></i> Command Decryption Key (Password)</label>
+            <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
             <input type="password" id="password" name="password" class="hud-input" placeholder="Minimum 6 characters" required>
             <span class="input-line-glow"></span>
           </div>
 
           <div class="input-hud-group">
-            <label for="confirmPassword"><i class="fa-solid fa-shield-halved"></i> Verify Decryption Key</label>
+            <label for="confirmPassword"><i class="fa-solid fa-shield-halved"></i> Confirm Password</label>
             <input type="password" id="confirmPassword" name="confirmPassword" class="hud-input" placeholder="Confirm password" required>
             <span class="input-line-glow"></span>
           </div>
@@ -106,7 +106,7 @@
 
         <button type="submit" class="btn-hud-action primary-btn" id="submit-btn">
           <span class="btn-glow-layer"></span>
-          <span class="btn-text"><i class="fa-solid fa-rocket"></i> Initiate Mission (Sign Up)</span>
+          <span class="btn-text"><i class="fa-solid fa-rocket"></i> Create Guardian Account</span>
         </button>
 
         <div class="divider">
@@ -413,7 +413,7 @@
           "> BOOTING ECO-RESTORATION ENGINE...",
           "> CULTIVATING FOREST GRID SPECIES...",
           "> LEVEL 1 GUARDIAN ACCESS GRANTED.",
-          "> SYNCHRONIZING DIAGNOSTIC SCAN Core..."
+          "> INITIALIZING DIAGNOSTIC SCAN..."
         ];
         
         logs.forEach((log, index) => {
@@ -424,7 +424,7 @@
 
         // Redirect after cinematic
         setTimeout(() => {
-          window.location.href = '/scan';
+          window.location.href = '/diagnostic-scan';
         }, 4000);
       }, 1200);
 

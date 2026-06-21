@@ -250,6 +250,22 @@ app.get('/scan', requireAuth, (req, res) => {
   res.render('scan', { user: req.session.user });
 });
 
+app.get('/assessment', requireAuth, (req, res) => {
+  res.redirect('/scan');
+});
+
+app.get('/diagnostic-scan', requireAuth, (req, res) => {
+  res.redirect('/scan');
+});
+
+app.get('/dashboard', requireAuth, (req, res) => {
+  res.redirect('/');
+});
+
+app.get('/world', requireAuth, (req, res) => {
+  res.redirect('/');
+});
+
 app.post('/api/save-scan', requireAuth, async (req, res) => {
   const { carbonScore, rating, classification } = req.body;
   const user = req.session.user;
