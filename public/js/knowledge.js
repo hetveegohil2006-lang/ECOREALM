@@ -398,10 +398,12 @@ function toggleHelpCheck(idx) {
   
   if(checkStates[idx]) {
     card.classList.add('active');
+    card.setAttribute('aria-checked', 'true');
     ind.classList.add('checked');
     playSuccessChirp();
   } else {
     card.classList.remove('active');
+    card.setAttribute('aria-checked', 'false');
     ind.classList.remove('checked');
   }
   
@@ -490,9 +492,298 @@ window.triggerTelemetryQuery = () => {
   }, 25);
 };
 
+// --- SECTION 7: INTERACTIVE CLIMATE QUIZ ---
+const QUIZ_QUESTIONS = [
+  {
+    q: "What is the primary greenhouse gas responsible for human-caused climate change?",
+    options: ["Carbon Dioxide (CO₂)", "Oxygen (O₂)", "Nitrogen (N₂)", "Argon (Ar)"],
+    answer: 0,
+    explanation: "CO₂ from burning fossil fuels is the dominant driver of modern climate change, representing ~76% of total greenhouse gas emissions."
+  },
+  {
+    q: "By what percentage does public transit reduce an individual's greenhouse gas emissions compared to driving alone?",
+    options: ["Up to 45%", "Up to 62%", "Up to 82%", "Up to 91%"],
+    answer: 2,
+    explanation: "Switching to public transit can reduce individual greenhouse gas emissions by up to 82%, making it one of the single most impactful lifestyle changes."
+  },
+  {
+    q: "What current CO₂ concentration (PPM) in the atmosphere is considered dangerously high?",
+    options: ["280 PPM", "350 PPM", "400 PPM", "428 PPM+"],
+    answer: 3,
+    explanation: "Pre-industrial CO₂ was ~280 PPM. We are now at 428+ PPM — the highest in at least 3 million years of geological history."
+  },
+  {
+    q: "Which dietary change has the largest positive impact on your carbon footprint?",
+    options: ["Reducing plastic use", "Eating less meat and dairy", "Taking shorter showers", "Unplugging electronics"],
+    answer: 1,
+    explanation: "Animal agriculture accounts for up to 18% of global greenhouse gas emissions. A plant-rich diet can reduce your food carbon footprint by up to 73%."
+  },
+  {
+    q: "How much of global electricity could be provided by solar energy alone by 2050 according to current projections?",
+    options: ["15%", "27%", "38%", "Over 50%"],
+    answer: 3,
+    explanation: "The IEA projects solar PV alone could supply over 50% of global electricity by 2050 under a net-zero scenario, making it the world's largest electricity source."
+  },
+  {
+    q: "At what temperature rise will approximately 99% of coral reefs be severely bleached?",
+    options: ["+1.0°C", "+1.5°C", "+2.0°C", "+3.0°C"],
+    answer: 2,
+    explanation: "At 1.5°C warming, 70-90% of corals are lost. At 2.0°C, over 99% of coral reefs are functionally destroyed — a catastrophic biodiversity loss."
+  },
+  {
+    q: "How many tonnes of plastic enter the world's oceans every year?",
+    options: ["2 million tonnes", "8 million tonnes", "14 million tonnes", "25 million tonnes"],
+    answer: 1,
+    explanation: "Approximately 8 million tonnes of plastic enter the ocean yearly, damaging marine ecosystems and entering the food chain through microplastics."
+  },
+  {
+    q: "What percentage of a typical home's electricity bill is attributed to 'standby' or phantom power consumption?",
+    options: ["Up to 5%", "Up to 10%", "Up to 20%", "Up to 35%"],
+    answer: 1,
+    explanation: "Standby power (devices left plugged in but not in active use) accounts for up to 10% of residential electricity bills. Unplugging idle devices is a simple fix."
+  },
+  {
+    q: "How much CO₂ can a single mature tree absorb per year?",
+    options: ["~2 kg", "~10 kg", "~22 kg", "~50 kg"],
+    answer: 2,
+    explanation: "A mature tree can absorb approximately 22 kg of CO₂ per year, highlighting how reforestation is a natural carbon capture solution."
+  },
+  {
+    q: "By how much has global sea level risen since 1880?",
+    options: ["5 cm", "10 cm", "20 cm", "40 cm"],
+    answer: 2,
+    explanation: "Sea levels have risen approximately 20 cm since 1880 due to thermal expansion of water and melting ice. The rate is accelerating, threatening coastal cities."
+  }
+];
+
+let quizState = {
+  active: false,
+  currentQ: 0,
+  score: 0,
+  answered: false
+};
+
+/**
+ * Starts the Interactive Climate Quiz from the intro screen.
+ */
+window.startKnowledgeQuiz = () => {
+  playClickSound();
+  quizState = { active: true, currentQ: 0, score: 0, answered: false };
+  
+  document.getElementById('k-quiz-intro').style.display = 'none';
+  document.getElementById('k-quiz-complete').style.display = 'none';
+  document.getElementById('k-quiz-question-box').style.display = 'block';
+  
+  renderQuizQuestion();
+};
+
+/**
+ * Renders the current quiz question and answer options.
+ */
+function renderQuizQuestion() {
+  const q = QUIZ_QUESTIONS[quizState.currentQ];
+  const total = QUIZ_QUESTIONS.length;
+  
+  // Update progress
+  const progressEl = document.getElementById('k-quiz-progress');
+  if (progressEl) progressEl.textContent = `QUESTION ${quizState.currentQ + 1}/${total}`;
+  
+  // Update question text
+  const qTextEl = document.getElementById('k-quiz-question-text');
+  if (qTextEl) {
+    qTextEl.textContent = q.q;
+    // Animate in
+    gsap.fromTo(qTextEl, { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.3 });
+  }
+  
+  // Render answer options
+  const optionsEl = document.getElementById('k-quiz-options');
+  if (!optionsEl) return;
+  optionsEl.innerHTML = '';
+  
+  q.options.forEach((option, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option-btn';
+    btn.setAttribute('aria-label', `Answer option ${idx + 1}: ${option}`);
+    btn.textContent = option;
+    btn.style.cssText = `
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      color: #e0f7fa;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    `;
+    btn.addEventListener('mouseenter', () => {
+      if (!quizState.answered) {
+        btn.style.background = 'rgba(0, 240, 255, 0.12)';
+        btn.style.borderColor = 'rgba(0, 240, 255, 0.5)';
+        playHoverSound();
+      }
+    });
+    btn.addEventListener('mouseleave', () => {
+      if (!quizState.answered && !btn.dataset.selected) {
+        btn.style.background = 'rgba(0, 240, 255, 0.05)';
+        btn.style.borderColor = 'rgba(0, 240, 255, 0.2)';
+      }
+    });
+    btn.addEventListener('click', () => handleQuizAnswer(idx));
+    optionsEl.appendChild(btn);
+  });
+  
+  quizState.answered = false;
+}
+
+/**
+ * Handles user's answer selection — shows feedback and advances the quiz.
+ * @param {number} selectedIdx - The index of the selected answer option.
+ */
+function handleQuizAnswer(selectedIdx) {
+  if (quizState.answered) return; // Prevent double-clicking
+  quizState.answered = true;
+  
+  const q = QUIZ_QUESTIONS[quizState.currentQ];
+  const isCorrect = selectedIdx === q.answer;
+  const optionBtns = document.querySelectorAll('#k-quiz-options .quiz-option-btn');
+  
+  // Disable all buttons
+  optionBtns.forEach(btn => { btn.style.cursor = 'default'; });
+  
+  // Highlight correct and wrong
+  optionBtns.forEach((btn, idx) => {
+    if (idx === q.answer) {
+      btn.style.background = 'rgba(57, 255, 20, 0.18)';
+      btn.style.borderColor = 'var(--accent-green)';
+      btn.style.color = 'var(--accent-green)';
+    } else if (idx === selectedIdx && !isCorrect) {
+      btn.style.background = 'rgba(255, 50, 50, 0.18)';
+      btn.style.borderColor = '#ff4444';
+      btn.style.color = '#ff6666';
+    }
+  });
+  
+  if (isCorrect) {
+    quizState.score++;
+    playSuccessChirp();
+  } else {
+    playWarningSiren();
+  }
+  
+  // Show brief explanation feedback inline
+  const optionsEl = document.getElementById('k-quiz-options');
+  const feedbackDiv = document.createElement('div');
+  feedbackDiv.style.cssText = `
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(${isCorrect ? '57,255,20' : '255,50,50'}, 0.08);
+    border-left: 3px solid ${isCorrect ? 'var(--accent-green)' : '#ff4444'};
+    color: ${isCorrect ? 'var(--accent-green)' : '#ff8888'};
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    border-radius: 0 4px 4px 0;
+  `;
+  feedbackDiv.innerHTML = `<strong>${isCorrect ? '✓ CORRECT:' : '✗ INCORRECT:'}</strong> ${q.explanation}`;
+  optionsEl.appendChild(feedbackDiv);
+  gsap.fromTo(feedbackDiv, { opacity: 0, y: 5 }, { opacity: 1, y: 0, duration: 0.3 });
+  
+  // Advance after delay
+  setTimeout(() => {
+    quizState.currentQ++;
+    if (quizState.currentQ < QUIZ_QUESTIONS.length) {
+      gsap.to('#k-quiz-question-box', {
+        opacity: 0, duration: 0.2,
+        onComplete: () => {
+          renderQuizQuestion();
+          gsap.to('#k-quiz-question-box', { opacity: 1, duration: 0.25 });
+        }
+      });
+    } else {
+      showQuizComplete();
+    }
+  }, 2200);
+}
+
+/**
+ * Displays the quiz completion screen and optionally awards Eco Coins.
+ */
+function showQuizComplete() {
+  document.getElementById('k-quiz-question-box').style.display = 'none';
+  const completeEl = document.getElementById('k-quiz-complete');
+  completeEl.style.display = 'block';
+  
+  const total = QUIZ_QUESTIONS.length;
+  const score = quizState.score;
+  const pct = Math.round((score / total) * 100);
+  
+  // Set score label
+  const scoreLabel = document.getElementById('k-quiz-score-lbl');
+  if (scoreLabel) scoreLabel.textContent = `Score: ${score} / ${total}  (${pct}%)`;
+  
+  // Set feedback message
+  const feedbackMsg = document.getElementById('k-quiz-feedback');
+  if (feedbackMsg) {
+    if (pct === 100) {
+      feedbackMsg.textContent = 'PERFECT SCORE — ELITE GUARDIAN STATUS ACHIEVED! Your biosphere comprehension is flawless.';
+    } else if (pct >= 80) {
+      feedbackMsg.textContent = 'Excellent performance. You demonstrate strong environmental awareness. Keep deepening your knowledge.';
+    } else if (pct >= 60) {
+      feedbackMsg.textContent = 'Solid result. Review the Climate Effects and Carbon Footprint sections to reinforce weak nodes.';
+    } else {
+      feedbackMsg.textContent = 'Baseline scan complete. Explore the Knowledge Center modules and retake the evaluation to improve your score.';
+    }
+  }
+  
+  // Award Eco Coins via API if user is logged in
+  const coinsEarned = score * 5;  // 5 coins per correct answer
+  const xpEarned = score * 10;    // 10 XP per correct answer
+  
+  if (coinsEarned > 0) {
+    fetch('/api/award-coins', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ coins: coinsEarned, xp: xpEarned })
+    }).catch(() => {}); // Silently fail if not logged in
+  }
+  
+  gsap.fromTo(completeEl, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.4 });
+  playSuccessChirp();
+  setTimeout(() => playSuccessChirp(), 300);
+}
+
+/**
+ * Resets the quiz back to the intro screen.
+ */
+window.resetKnowledgeQuiz = () => {
+  playClickSound();
+  quizState = { active: false, currentQ: 0, score: 0, answered: false };
+  
+  document.getElementById('k-quiz-complete').style.display = 'none';
+  document.getElementById('k-quiz-question-box').style.display = 'none';
+  document.getElementById('k-quiz-intro').style.display = 'flex';
+  
+  gsap.fromTo('#k-quiz-intro', { opacity: 0 }, { opacity: 1, duration: 0.3 });
+};
+
+// --- DEBOUNCED RESIZE HANDLER ---
+let _resizeTimer = null;
+function debouncedResize() {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(resizeCarbonCanvas, 150);
+}
+
 // Initializer
 window.addEventListener('DOMContentLoaded', () => {
   attachSoundListeners();
   initCarbonParticles();
   initClimateSlider();
 });
+
+window.addEventListener('resize', debouncedResize, false);
+

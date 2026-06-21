@@ -96,7 +96,7 @@
     </aside>
 
     <!-- CENTER CONSOLE - LOGIN FORM & SUCCESS OVERLAYS -->
-    <main class="hud-center-console">
+    <main class="hud-center-console" id="main-content" role="main">
       <!-- Form console panel -->
       <div class="registration-hud-card glass-panel" id="login-form-card">
         <div class="hud-card-corners"></div>
@@ -106,27 +106,27 @@
           <p class="console-subtitle">The ecosystem awaits your command.</p>
         </div>
 
-        <div class="error-banner" id="error-banner" style="display: none;">
-          <i class="fa-solid fa-triangle-exclamation"></i> <span id="error-text">DEVIATION DETECTED</span>
+        <div class="error-banner" id="error-banner" style="display: none;" role="alert" aria-live="assertive">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span id="error-text">DEVIATION DETECTED</span>
         </div>
 
         <form id="login-form" autocomplete="off">
           <div class="input-hud-group">
-            <label for="email"><i class="fa-solid fa-envelope"></i> Core Comms Email</label>
+            <label for="email"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Core Comms Email</label>
             <input type="email" id="email" name="email" class="hud-input" placeholder="e.g. guardian@ecorealm.org"
-              required>
+              required aria-required="true" autocomplete="email">
             <span class="input-line-glow"></span>
           </div>
 
           <div class="input-hud-group">
-            <label for="password"><i class="fa-solid fa-lock"></i> Command Decryption Key (Password)</label>
+            <label for="password"><i class="fa-solid fa-lock" aria-hidden="true"></i> Command Decryption Key (Password)</label>
             <input type="password" id="password" name="password" class="hud-input" placeholder="Enter password"
-              required>
+              required aria-required="true" autocomplete="current-password">
             <span class="input-line-glow"></span>
           </div>
 
           <div class="login-options-row">
-            <label class="hud-checkbox-container">
+            <label class="hud-checkbox-container" for="rememberMe">
               <input type="checkbox" id="rememberMe">
               <span class="hud-checkbox-checkmark"></span>
               <span class="checkbox-label">Keep Sync Active</span>

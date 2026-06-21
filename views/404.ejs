@@ -1,0 +1,205 @@
+<%- include('partials/header') %>
+
+<style>
+  .error-page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #03050c;
+    font-family: var(--font-mono, 'Orbitron', monospace);
+    position: relative;
+    overflow: hidden;
+    padding: 40px 20px;
+  }
+
+  .error-page-container::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 240, 255, 0.015) 2px,
+      rgba(0, 240, 255, 0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .error-code {
+    font-size: clamp(6rem, 15vw, 12rem);
+    font-weight: 900;
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(135deg, #00f0ff, #39ff14, #00f0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    letter-spacing: -4px;
+    position: relative;
+    z-index: 2;
+    text-shadow: none;
+    animation: glitchCode 4s infinite;
+  }
+
+  @keyframes glitchCode {
+    0%, 90%, 100% { transform: translate(0, 0) skew(0deg); filter: hue-rotate(0deg); }
+    91%  { transform: translate(-3px, 1px) skew(-2deg); filter: hue-rotate(30deg); }
+    92%  { transform: translate(3px, -1px) skew(1deg); filter: hue-rotate(-20deg); }
+    93%  { transform: translate(0, 0) skew(0deg); filter: hue-rotate(0deg); }
+    94%  { transform: translate(-2px, 2px) skew(0.5deg); filter: hue-rotate(45deg); }
+    95%  { transform: translate(0, 0) skew(0deg); filter: hue-rotate(0deg); }
+  }
+
+  .error-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 4px;
+    color: #00f0ff;
+    border: 1px solid rgba(0,240,255,0.3);
+    padding: 4px 14px;
+    border-radius: 4px;
+    margin-bottom: 24px;
+    background: rgba(0,240,255,0.06);
+    z-index: 2;
+    position: relative;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(0,240,255,0.2); }
+    50% { opacity: 0.7; box-shadow: 0 0 18px rgba(0,240,255,0.4); }
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+    font-family: 'Orbitron', monospace;
+    color: #fff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    z-index: 2;
+    position: relative;
+  }
+
+  .error-desc {
+    max-width: 480px;
+    text-align: center;
+    color: rgba(0, 240, 255, 0.75);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    margin-bottom: 40px;
+    z-index: 2;
+    position: relative;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+  }
+
+  .btn-cyber {
+    padding: 12px 28px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    background: rgba(0, 240, 255, 0.08);
+    color: #00f0ff;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+
+  .btn-cyber:hover {
+    background: rgba(0, 240, 255, 0.18);
+    border-color: #00f0ff;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-cyber.green-theme {
+    border-color: rgba(57, 255, 20, 0.4);
+    background: rgba(57, 255, 20, 0.08);
+    color: #39ff14;
+  }
+  .btn-cyber.green-theme:hover {
+    background: rgba(57, 255, 20, 0.18);
+    border-color: #39ff14;
+    box-shadow: 0 0 16px rgba(57, 255, 20, 0.3);
+  }
+
+  .error-terminal {
+    margin-top: 48px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(0,240,255,0.15);
+    border-radius: 6px;
+    padding: 16px 20px;
+    max-width: 420px;
+    width: 100%;
+    font-size: 0.75rem;
+    color: rgba(0,240,255,0.5);
+    z-index: 2;
+    position: relative;
+  }
+
+  .error-terminal-line { margin-bottom: 4px; }
+  .error-terminal-line .prompt { color: #39ff14; }
+  .error-terminal-line .out { color: rgba(255,255,255,0.4); }
+  .error-terminal-line .err { color: #ff4444; }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+
+<div class="scanline"></div>
+<div class="grid-bg"></div>
+
+<div class="error-page-container" role="main" aria-label="404 Error Page">
+  <div class="error-badge" aria-label="Error status: Route Not Found">⚠ ROUTE_NOT_FOUND</div>
+  <div class="error-code" aria-hidden="true">404</div>
+  <h1 class="error-title">Sector Offline</h1>
+  <p class="error-desc">
+    The biosphere sector you are attempting to access does not exist in our network matrix.
+    The route may have been decomissioned, relocated, or never existed in the restoration grid.
+  </p>
+
+  <div class="error-actions">
+    <a href="/" class="btn-cyber green-theme" aria-label="Return to Command Center Dashboard">
+      <i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Command Center
+    </a>
+    <a href="javascript:history.back()" class="btn-cyber" aria-label="Go back to previous page">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Go Back
+    </a>
+  </div>
+
+  <div class="error-terminal" role="complementary" aria-label="Error diagnostic terminal">
+    <div class="error-terminal-line"><span class="prompt">ECOREALM_OS $</span> <span>route_scan --path "<%= typeof path !== 'undefined' ? path : req.path %>"</span></div>
+    <div class="error-terminal-line"><span class="out">  &gt; Scanning restoration grid sectors...</span></div>
+    <div class="error-terminal-line"><span class="err">  ERROR [404]: Sector not registered in biosphere matrix.</span></div>
+    <div class="error-terminal-line"><span class="out">  &gt; Recommend navigating to Command Center.</span></div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

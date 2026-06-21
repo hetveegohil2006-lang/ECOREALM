@@ -77,6 +77,34 @@ const diagnosticValidator = [
   validate
 ];
 
+// Carbon assessment validator
+const carbonAssessmentValidator = [
+  body('breakdown').notEmpty().withMessage('Breakdown details are required'),
+  body('breakdown.travel').isNumeric().withMessage('Travel must be a numeric value'),
+  body('breakdown.food').isNumeric().withMessage('Food must be a numeric value'),
+  body('breakdown.electricity').isNumeric().withMessage('Electricity must be a numeric value'),
+  body('breakdown.waste').isNumeric().withMessage('Waste must be a numeric value'),
+  body('breakdown.water').isNumeric().withMessage('Water must be a numeric value'),
+  body('breakdown.shopping').isNumeric().withMessage('Shopping must be a numeric value'),
+  body('period').optional().isString().withMessage('Period must be a string'),
+  body('notes').optional().isString().withMessage('Notes must be a string'),
+  validate
+];
+
+// Update profile validator
+const updateProfileValidator = [
+  body('username').optional().trim().isLength({ min: 3, max: 30 }).withMessage('Username must be 3–30 characters'),
+  body('email').optional().trim().isEmail().withMessage('Please enter a valid email'),
+  validate
+];
+
+// Change password validator
+const changePasswordValidator = [
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+  validate
+];
+
 module.exports = {
   validate,
   signupValidator,
@@ -85,5 +113,8 @@ module.exports = {
   resetPasswordValidator,
   chatValidator,
   postValidator,
-  diagnosticValidator
+  diagnosticValidator,
+  carbonAssessmentValidator,
+  updateProfileValidator,
+  changePasswordValidator
 };

@@ -24,7 +24,8 @@ const formatProfile = (profile, badges = []) => {
     island: profile.island,
     history: profile.history || [],
     badges: badges.map(b => ({ id: b.badge_id, earnedAt: b.earned_at })),
-    achievements: profile.achievements || []
+    achievements: profile.achievements || [],
+    role: profile.role
   };
 };
 

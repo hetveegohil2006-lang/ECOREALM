@@ -4,7 +4,8 @@
   "description": "EcoREALM Global Restoration Command OS web portal.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest --runInBand --forceExit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",
@@ -29,5 +30,9 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
 }

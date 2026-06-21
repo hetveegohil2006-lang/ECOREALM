@@ -5,18 +5,22 @@
 <div class="hud-container">
   
   <!-- Cyber HUD Header -->
-  <header class="hud-header">
+  <header class="hud-header" role="banner">
     <div class="hud-logo-area"
          onclick="switchTab('orbital'); if(typeof playClickSound==='function') playClickSound();"
          title="Return to Command Center"
+         aria-label="EcoREALM — Return to Orbital Sector"
+         role="button"
+         tabindex="0"
          style="cursor:pointer; transition: filter 0.25s ease;"
          onmouseenter="this.style.filter='drop-shadow(0 0 10px rgba(0,240,255,0.5))'"
-         onmouseleave="this.style.filter='none'">
-      <div class="hud-logo-icon">
+         onmouseleave="this.style.filter='none'"
+         onkeydown="if(event.key==='Enter'){switchTab('orbital');}">
+      <div class="hud-logo-icon" aria-hidden="true">
         <i class="fa-solid fa-satellite-dish"></i>
       </div>
       <h1 class="hud-logo-text">EcoREALM</h1>
-      <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); border: 1px solid rgba(0,240,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 10px;">SECTOR_7_ACTIVE</span>
+      <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); border: 1px solid rgba(0,240,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 10px;" aria-hidden="true">SECTOR_7_ACTIVE</span>
     </div>
 
     <!-- Ticker metrics of current session state -->
@@ -59,9 +63,9 @@
         <span class="hud-user-name" id="hud-username-val"><%= user.username %></span>
         <span class="hud-user-rank" id="rank-val"><%= user.rank %></span>
       </div>
-      <a href="/logout">
-        <button class="btn-hud-logout">
-          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+      <a href="/logout" aria-label="Sign out of your account">
+        <button class="btn-hud-logout" aria-label="Sign Out">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign Out
         </button>
       </a>
     </div>
@@ -69,50 +73,50 @@
 
   <!-- Side Navigation & Main terminal Viewport -->
   <div class="hud-grid">
-    <aside class="hud-sidebar">
+    <aside class="hud-sidebar" role="navigation" aria-label="Dashboard navigation">
       <div class="hud-menu-group">
         <span class="hud-menu-header">Simulation Command</span>
-        <button class="hud-tab-btn active" onclick="switchTab('orbital')">
-          <i class="fa-solid fa-cubes"></i> <span>Orbital Sector</span>
+        <button class="hud-tab-btn active" onclick="switchTab('orbital')" aria-label="Orbital Sector — 3D Island Simulator" aria-current="true">
+          <i class="fa-solid fa-cubes" aria-hidden="true"></i> <span>Orbital Sector</span>
         </button>
-        <button class="hud-tab-btn" onclick="switchTab('worldmap')">
-          <i class="fa-solid fa-map-location-dot"></i> <span>Planetary Map</span>
+        <button class="hud-tab-btn" onclick="switchTab('worldmap')" aria-label="Planetary Map — World View">
+          <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> <span>Planetary Map</span>
         </button>
         
         <span class="hud-menu-header" style="margin-top: 15px;">Operations Deck</span>
-        <button class="hud-tab-btn" onclick="switchTab('challenges')">
-          <i class="fa-solid fa-list-check"></i> <span>Missions Deck</span>
+        <button class="hud-tab-btn" onclick="switchTab('challenges')" aria-label="Missions Deck — Daily Eco Challenges">
+          <i class="fa-solid fa-list-check" aria-hidden="true"></i> <span>Missions Deck</span>
         </button>
-        <button class="hud-tab-btn" onclick="switchTab('carbon')">
-          <i class="fa-solid fa-clipboard-question"></i> <span>Carbon Diagnostic</span>
+        <button class="hud-tab-btn" onclick="switchTab('carbon')" aria-label="Carbon Diagnostic — Footprint Wizard">
+          <i class="fa-solid fa-clipboard-question" aria-hidden="true"></i> <span>Carbon Diagnostic</span>
         </button>
-        <button class="hud-tab-btn" onclick="switchTab('arcade')">
-          <i class="fa-solid fa-gamepad"></i> <span>Cosmic Arcade</span>
+        <button class="hud-tab-btn" onclick="switchTab('arcade')" aria-label="Cosmic Arcade — Mini Games">
+          <i class="fa-solid fa-gamepad" aria-hidden="true"></i> <span>Cosmic Arcade</span>
         </button>
 
         <span class="hud-menu-header" style="margin-top: 15px;">Mainframe Network</span>
-        <button class="hud-tab-btn" onclick="switchTab('community')">
-          <i class="fa-solid fa-tower-broadcast"></i> <span>Community Link</span>
+        <button class="hud-tab-btn" onclick="switchTab('community')" aria-label="Community Link — Social Feed">
+          <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i> <span>Community Link</span>
         </button>
-        <button class="hud-tab-btn" onclick="switchTab('profile')">
-          <i class="fa-solid fa-id-card-clip"></i> <span>Command Tier</span>
+        <button class="hud-tab-btn" onclick="switchTab('profile')" aria-label="Command Tier — Your Profile">
+          <i class="fa-solid fa-id-card-clip" aria-hidden="true"></i> <span>Command Tier</span>
         </button>
-        <a href="/knowledge" style="text-decoration: none;">
-          <button class="hud-tab-btn" style="width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-graduation-cap"></i> <span>Knowledge Center</span>
+        <a href="/knowledge" style="text-decoration: none;" aria-label="Knowledge Center — Learn about climate">
+          <button class="hud-tab-btn" style="width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;" aria-label="Knowledge Center">
+            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> <span>Knowledge Center</span>
           </button>
         </a>
       </div>
 
       <!-- Footer sound control inside sidebar -->
       <div class="hud-audio-control">
-        <span class="audio-toggle-lbl"><i class="fa-solid fa-volume-high"></i> SYSTEM SOUNDS</span>
-        <div class="audio-switch active" id="audio-toggle-switch" onclick="toggleAudioSystem()"></div>
+        <span class="audio-toggle-lbl" id="audio-label"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> SYSTEM SOUNDS</span>
+        <div class="audio-switch active" id="audio-toggle-switch" onclick="toggleAudioSystem()" role="switch" aria-checked="true" aria-labelledby="audio-label" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAudioSystem();}"></div>
       </div>
     </aside>
 
     <!-- Main Viewport screens container -->
-    <main class="hud-main-frame" id="hud-main-frame">
+    <main class="hud-main-frame" id="main-content" role="main" aria-label="Dashboard main content area">
       
       <!-- 1. ORBITAL VIEW (3D Simulator) -->
       <section class="hud-viewport-screen active" id="screen-orbital">
@@ -142,7 +146,7 @@
               <div class="orbital-hud-telemetry" id="3d-solar-counter">> SOLAR ARRAY CONNECTIONS: <%= user.island.solarPanels %></div>
             </div>
             
-            <canvas id="realm-canvas"></canvas>
+            <canvas id="realm-canvas" aria-label="3D Floating Island Ecosystem Simulation" role="img"></canvas>
             
             <div class="canvas-controls-hint">
               <i class="fa-solid fa-arrows-spin"></i> Rotate: Click & Drag | Zoom: Scroll
@@ -153,8 +157,8 @@
           <div class="orbital-controls-bar">
             <span class="orbital-controls-title"><i class="fa-solid fa-circle-info"></i> Simulation Control Parameters</span>
             <div class="orbital-btn-switches">
-              <button class="btn-switch-hud active" id="btn-toggle-scanlines" onclick="toggleScanlines()">Scanlines: ON</button>
-              <button class="btn-switch-hud" id="btn-toggle-lighting" onclick="toggleSimulationLighting()">Day/Night: DAY</button>
+              <button class="btn-switch-hud active" id="btn-toggle-scanlines" onclick="toggleScanlines()" aria-label="Toggle scanline overlay" role="switch" aria-checked="true">Scanlines: ON</button>
+              <button class="btn-switch-hud" id="btn-toggle-lighting" onclick="toggleSimulationLighting()" aria-label="Toggle day and night lighting" role="switch" aria-checked="false">Day/Night: DAY</button>
             </div>
           </div>
         </div>
@@ -179,22 +183,22 @@
               <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(0,240,255,0.08)" stroke-dasharray="5,5" />
               
               <!-- Industrial Restoration Zone (North America) -->
-              <path class="map-region-node" d="M150 120 L280 120 L280 200 L180 200 Z" id="region-industrial" onclick="selectMapRegion('industrial')" />
+              <path class="map-region-node" d="M150 120 L280 120 L280 200 L180 200 Z" id="region-industrial" onclick="selectMapRegion('industrial')" role="button" tabindex="0" aria-label="Industrial Restoration Zone: North America" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('industrial');}" />
               
               <!-- Ocean Cleanup Coast (Atlantic/Pacific Coast) -->
-              <path class="map-region-node" d="M300 240 L350 210 L380 280 L330 310 Z" id="region-ocean" onclick="selectMapRegion('ocean')" />
+              <path class="map-region-node" d="M300 240 L350 210 L380 280 L330 310 Z" id="region-ocean" onclick="selectMapRegion('ocean')" role="button" tabindex="0" aria-label="Ocean Cleanup Coast: Atlantic and Pacific Coast" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('ocean');}" />
               
               <!-- Forest Conservation Zone (Amazon basin) -->
-              <path class="map-region-node" d="M220 280 L290 280 L310 380 L200 360 Z" id="region-forest" onclick="selectMapRegion('forest')" />
+              <path class="map-region-node" d="M220 280 L290 280 L310 380 L200 360 Z" id="region-forest" onclick="selectMapRegion('forest')" role="button" tabindex="0" aria-label="Forest Conservation Zone: Amazon Basin" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('forest');}" />
               
               <!-- Green Energy Zone (Europe/North Africa) -->
-              <path class="map-region-node" d="M480 140 L580 120 L610 200 L510 220 Z" id="region-energy" onclick="selectMapRegion('energy')" />
+              <path class="map-region-node" d="M480 140 L580 120 L610 200 L510 220 Z" id="region-energy" onclick="selectMapRegion('energy')" role="button" tabindex="0" aria-label="Green Energy Zone: Europe and North Africa" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('energy');}" />
               
               <!-- Wildlife Sanctuary (African Savannah / Asia forests) -->
-              <path class="map-region-node" d="M520 250 L620 240 L650 350 L560 360 Z" id="region-wildlife" onclick="selectMapRegion('wildlife')" />
+              <path class="map-region-node" d="M520 250 L620 240 L650 350 L560 360 Z" id="region-wildlife" onclick="selectMapRegion('wildlife')" role="button" tabindex="0" aria-label="Wildlife Sanctuary: African Savannah and Asia Forests" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('wildlife');}" />
               
               <!-- Net-Zero Future Hub (East Asia/Japan) -->
-              <path class="map-region-node" d="M750 150 L860 140 L880 240 L780 260 Z" id="region-future" onclick="selectMapRegion('future')" />
+              <path class="map-region-node" d="M750 150 L860 140 L880 240 L780 260 Z" id="region-future" onclick="selectMapRegion('future')" role="button" tabindex="0" aria-label="Net-Zero Future Hub: East Asia and Japan" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectMapRegion('future');}" />
               
               <!-- SVG Labels -->
               <text x="210" y="160" fill="#fff" font-family="var(--font-mono)" font-size="12" text-anchor="middle" pointer-events="none">INDUSTRIAL CO-1</text>
@@ -321,12 +325,48 @@
           <!-- Step 5: Scoring -->
           <div class="carbon-step-card" id="carbon-step-5">
             <span class="carbon-step-title">[DIAGNOSTIC COMPLETED] Mainframe Feedback</span>
-            <div class="carbon-score-display">
-              <div class="carbon-score-ring"><span id="carbon-final-score">15.8</span></div>
-              <p style="font-weight: bold; color: var(--accent-cyan);" id="carbon-grade-label">DIAGNOSTIC: CRITICAL DEGRADATION</p>
-              <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 400px; line-height: 1.5;">
-                Your estimated annual carbon score is <span id="carbon-score-text">15.8</span> metric tonnes. The global target is under 2.0 tonnes. Complete daily challenges to reduce this load and earn command rewards.
-              </p>
+            <div class="carbon-score-display" style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
+              <div style="display: flex; gap: 20px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap;">
+                <div class="carbon-score-ring"><span id="carbon-final-score">15.8</span></div>
+                <div style="text-align: left; max-width: 300px;">
+                  <p style="font-weight: bold; color: var(--accent-cyan); font-family: var(--font-mono);" id="carbon-grade-label">DIAGNOSTIC: CRITICAL DEGRADATION</p>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-top: 5px;">
+                    Your estimated annual carbon score is <span id="carbon-score-text">15.8</span> metric tonnes. The global target is under 2.0 tonnes.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Carbon Projections -->
+              <div class="glass-panel" style="width: 100%; padding: 15px; text-align: left; box-sizing: border-box;">
+                <span class="dossier-label-mini" style="margin-bottom: 10px; display: block;"><i class="fa-solid fa-chart-line"></i> Projected Emissions Projections</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                  <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(0,240,255,0.05);">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">DAILY</span>
+                    <span style="font-family: var(--font-mono); font-size: 1rem; font-weight: bold; color: var(--accent-cyan);" id="proj-daily">0.0</span> <span style="font-size: 0.7rem; color: var(--text-muted);">kg</span>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(0,240,255,0.05);">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">WEEKLY</span>
+                    <span style="font-family: var(--font-mono); font-size: 1rem; font-weight: bold; color: var(--accent-cyan);" id="proj-weekly">0.0</span> <span style="font-size: 0.7rem; color: var(--text-muted);">kg</span>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(0,240,255,0.05);">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">MONTHLY</span>
+                    <span style="font-family: var(--font-mono); font-size: 1rem; font-weight: bold; color: var(--accent-cyan);" id="proj-monthly">0.0</span> <span style="font-size: 0.7rem; color: var(--text-muted);">kg</span>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(0,240,255,0.05);">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">YEARLY</span>
+                    <span style="font-family: var(--font-mono); font-size: 1rem; font-weight: bold; color: var(--accent-cyan);" id="proj-yearly">0.0</span> <span style="font-size: 0.7rem; color: var(--text-muted);">kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Recommendations -->
+              <div class="glass-panel-green" style="width: 100%; padding: 15px; text-align: left; border-color: rgba(57,255,20,0.15) !important; box-sizing: border-box;">
+                <span class="dossier-label-mini" style="color: var(--accent-green); margin-bottom: 10px; display: block;"><i class="fa-solid fa-robot"></i> Personal AI Recommendations</span>
+                <div id="ai-recs-list" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; color: var(--text-cyan);">
+                  <!-- Populated dynamically via JS -->
+                </div>
+              </div>
+
               <button class="btn-cyber green-theme" style="padding: 10px 24px;" onclick="resetCarbonWizard()">
                 <i class="fa-solid fa-arrows-rotate"></i> Recalibrate Core
               </button>
@@ -352,53 +392,53 @@
         
         <div class="arcade-grid">
           <!-- Game 1 -->
-          <div class="arcade-card" onclick="launchGame('recycling')">
+          <div class="arcade-card" onclick="launchGame('recycling')" role="button" tabindex="0" aria-label="Launch Game: Recycling Rush" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); launchGame('recycling');}">
             <div class="arcade-card-info">
-              <div class="arcade-icon"><i class="fa-solid fa-recycle"></i></div>
+              <div class="arcade-icon"><i class="fa-solid fa-recycle" aria-hidden="true"></i></div>
               <h3 class="arcade-title">Recycling Rush</h3>
               <p class="arcade-desc">Catch sorting material (Plastic, Metal, Paper) in the proper containers. Avoid falling hazard waste core batteries!</p>
             </div>
-            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 30 Coins</div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins" aria-hidden="true"></i> Yield: Up to 30 Coins</div>
           </div>
 
           <!-- Game 2 -->
-          <div class="arcade-card" onclick="launchGame('quiz')">
+          <div class="arcade-card" onclick="launchGame('quiz')" role="button" tabindex="0" aria-label="Launch Game: Eco Quiz" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); launchGame('quiz');}">
             <div class="arcade-card-info">
-              <div class="arcade-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <div class="arcade-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></div>
               <h3 class="arcade-title">Eco Quiz</h3>
               <p class="arcade-desc">Test your climatic sciences comprehension. Answer restoration questions to earn rewards.</p>
             </div>
-            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 25 Coins</div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins" aria-hidden="true"></i> Yield: Up to 25 Coins</div>
           </div>
 
           <!-- Game 3 -->
-          <div class="arcade-card" onclick="launchGame('grid')">
+          <div class="arcade-card" onclick="launchGame('grid')" role="button" tabindex="0" aria-label="Launch Game: Energy Grid Puzzle" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); launchGame('grid');}">
             <div class="arcade-card-info">
-              <div class="arcade-icon"><i class="fa-solid fa-circle-nodes"></i></div>
+              <div class="arcade-icon"><i class="fa-solid fa-circle-nodes" aria-hidden="true"></i></div>
               <h3 class="arcade-title">Energy Grid Puzzle</h3>
               <p class="arcade-desc">Align rotating kinetic and solar cables. Route renewable electricity generator modules to power the city nodes.</p>
             </div>
-            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 35 Coins</div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins" aria-hidden="true"></i> Yield: Up to 35 Coins</div>
           </div>
 
           <!-- Game 4 -->
-          <div class="arcade-card" onclick="launchGame('ocean')">
+          <div class="arcade-card" onclick="launchGame('ocean')" role="button" tabindex="0" aria-label="Launch Game: Ocean Cleanup" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); launchGame('ocean');}">
             <div class="arcade-card-info">
-              <div class="arcade-icon"><i class="fa-solid fa-droplet"></i></div>
+              <div class="arcade-icon"><i class="fa-solid fa-droplet" aria-hidden="true"></i></div>
               <h3 class="arcade-title">Ocean Cleanup</h3>
               <p class="arcade-desc">Clean marine waste. Double-click floating plastic garbage objects in coastal waters before the timer runs out!</p>
             </div>
-            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 30 Coins</div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins" aria-hidden="true"></i> Yield: Up to 30 Coins</div>
           </div>
 
           <!-- Game 5 -->
-          <div class="arcade-card" onclick="launchGame('tree')">
+          <div class="arcade-card" onclick="launchGame('tree')" role="button" tabindex="0" aria-label="Launch Game: Tree Simulator" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); launchGame('tree');}">
             <div class="arcade-card-info">
-              <div class="arcade-icon"><i class="fa-solid fa-seedling"></i></div>
+              <div class="arcade-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></div>
               <h3 class="arcade-title">Tree Simulator</h3>
               <p class="arcade-desc">Cultivate a digital seedling. Coordinate dig, seeding, watering, and solar light loops to grow a mature pine.</p>
             </div>
-            <div class="arcade-reward-info"><i class="fa-solid fa-coins"></i> Yield: Up to 20 Coins</div>
+            <div class="arcade-reward-info"><i class="fa-solid fa-coins" aria-hidden="true"></i> Yield: Up to 20 Coins</div>
           </div>
         </div>
       </section>
@@ -494,6 +534,20 @@
               </div>
               <div class="xp-bar-outer" style="height: 10px; margin-top: 0;">
                 <div class="xp-bar-inner" id="xp-bar"></div>
+              </div>
+            </div>
+
+            <!-- Daily Streak Tracker -->
+            <div class="glass-panel" style="width: 100%; margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.25); border-color: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-fire glow-yellow" style="font-size: 1.4rem; color: #ff9900;"></i>
+                <div style="text-align: left;">
+                  <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-cyan); display: block;">DAILY STREAK</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted);">Log daily missions to build your streak!</span>
+                </div>
+              </div>
+              <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: bold; color: var(--accent-yellow);" id="streak-val-display">
+                <%= user.island.loginStreak || 1 %> <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">DAYS</span>
               </div>
             </div>
             
@@ -751,7 +805,6 @@
   </div>
 </div>
 
-<!-- Inject Initial User State for Scripts -->
 <script>
   window.initialIslandData = <%- JSON.stringify(user.island) %>;
   window.initialXP = <%= user.xp %>;
@@ -762,6 +815,7 @@
   window.initialEnergy = <%= user.energyConserved %>;
   window.netZeroUnlocked = <%= user.netZeroUnlocked %>;
   window.customTitleBought = <%= user.customTitleBought %>;
+  window.initialStartingCarbon = <%= user.startingCarbonScore || 16.0 %>;
 </script>
 
 <!-- Supabase Realtime Integration -->

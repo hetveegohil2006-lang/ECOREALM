@@ -27,7 +27,7 @@
   --font-mono: 'Share Tech Mono', monospace;
   
   --text-primary: #f1f5f9;
-  --text-muted: #64748b;
+  --text-muted: #94a3b8;
   --text-cyan: #a5f3fc;
 }
 
@@ -4092,5 +4092,119 @@ body.page-login.boot-complete #global-logo-nav {
   z-index: 5;
 }
 
+/* ============================================================
+   ACCESSIBILITY — WCAG AA COMPLIANCE
+   ============================================================ */
 
+/* Allow text selection on form inputs and readable content */
+input, textarea, select, p, h1, h2, h3, h4, h5, h6, li, td, th, label, span.selectable {
+  user-select: text;
+}
 
+/* Skip-to-main-content link (keyboard navigation) */
+.skip-to-main {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--accent-cyan);
+  color: #03050c;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 99999;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-to-main:focus {
+  top: 16px;
+}
+
+/* Global focus-visible indicator — visible only for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.25) !important;
+  border-radius: 3px;
+}
+
+/* High-contrast focus for green-theme buttons */
+.btn-cyber.green-theme:focus-visible,
+.hud-tab-btn:focus-visible {
+  outline-color: var(--accent-green) !important;
+  box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.25) !important;
+}
+
+/* Form inputs focus (already covered by :focus-visible but be explicit) */
+.hud-input:focus-visible,
+.sync-input:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.2), 0 0 12px var(--accent-cyan-glow) !important;
+}
+
+/* Remove outline for mouse users (focus-visible does this automatically, 
+   but keep explicit for older browsers) */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Screen reader only utility — hides element visually but keeps it accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High-contrast error state with accessible color */
+.error-banner[role="alert"] {
+  border-left: 3px solid #ff4444;
+}
+
+/* Ensure ARIA-disabled buttons are visible */
+button[aria-disabled="true"],
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus indicator for link navigation in Knowledge Center and Dashboard */
+a:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 4px !important;
+  border-radius: 2px;
+}
+
+/* Quiz option buttons accessible focus */
+.quiz-option-btn:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.25) !important;
+}
+
+/* General keyboard focus indicator styles for WCAG AA compliance */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.hud-tab-btn:focus-visible,
+.btn-cyber:focus-visible,
+.btn-switch-hud:focus-visible,
+.arcade-card:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 10px var(--accent-cyan-glow) !important;
+}

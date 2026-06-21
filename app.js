@@ -150,6 +150,36 @@ const requireAuth = async (req, res, next) => {
           .single();
         
         if (profile) {
+          const island = profile.island || {
+            trees: 1,
+            flowers: 1,
+            waterCleanliness: 25,
+            meadowGreenness: 25,
+            solarPanels: 0,
+            windTurbines: 0,
+            loginStreak: 1,
+            lastLoginDate: ''
+          };
+
+          const todayStr = new Date().toDateString();
+          if (island.lastLoginDate !== todayStr) {
+            if (island.lastLoginDate) {
+              const lastDate = new Date(island.lastLoginDate);
+              const diffTime = Math.abs(new Date() - lastDate);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              if (diffDays === 1) {
+                island.loginStreak = (island.loginStreak || 1) + 1;
+              } else if (diffDays > 1) {
+                island.loginStreak = 1;
+              }
+            } else {
+              island.loginStreak = 1;
+            }
+            island.lastLoginDate = todayStr;
+            // Sync streak back to database
+            await supabase.from('profiles').update({ island }).eq('id', authUser.id);
+          }
+
           req.session.user = {
             _id: profile.id,
             username: profile.username,
@@ -164,14 +194,7 @@ const requireAuth = async (req, res, next) => {
             netZeroUnlocked: profile.net_zero_unlocked || false,
             customTitleBought: profile.custom_title_bought || false,
             scanCompleted: profile.scan_completed || false,
-            island: profile.island || {
-              trees: 1,
-              flowers: 1,
-              waterCleanliness: 25,
-              meadowGreenness: 25,
-              solarPanels: 0,
-              windTurbines: 0
-            },
+            island: island,
             history: profile.history || []
           };
           return next();
@@ -653,10 +676,20 @@ app.use('/api', apiLimiter);
 // Centralized Error Handler Middleware
 app.use(errorHandler);
 
+// ============= 404 CATCH-ALL (must be LAST route) =============
+app.use((req, res) => {
+  const acceptsHtml = req.headers.accept && req.headers.accept.includes('text/html');
+  if (acceptsHtml && !req.path.startsWith('/api/')) {
+    return res.status(404).render('404', { path: req.path });
+  }
+  return res.status(404).json({ success: false, error: `Route ${req.path} not found.` });
+});
+
+
 // Build HTTP Server wrapping Express App
 const server = http.createServer(app);
 
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+if (process.env.NODE_ENV !== 'test' && (process.env.NODE_ENV !== 'production' || !process.env.VERCEL)) {
   server.listen(PORT, () => {
     console.log(`🚀 EcoRealm OS server running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${PORT}`);
   });

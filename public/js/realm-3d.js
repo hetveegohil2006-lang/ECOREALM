@@ -119,9 +119,14 @@ function initRealm3D(canvasId, initialData) {
   };
   animate();
 
-  // Resize listener
-  window.addEventListener('resize', onWindowResize, false);
+  // Debounced resize listener
+  let _realmResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_realmResizeTimer);
+    _realmResizeTimer = setTimeout(onWindowResize, 150);
+  }, false);
 }
+
 
 function onWindowResize() {
   const container = document.getElementById('realm-canvas').parentElement;
@@ -601,3 +606,65 @@ function toggleSimulationLighting() {
     btn.classList.remove('active');
   }
 }
+
+/**
+ * Updates the 3D island scene based on the user's carbon score, offset level, and shop upgrades.
+ * Called from dashboard.js when user data is loaded or updated.
+ * @param {number} carbonKg - User's current carbon footprint in kg CO2e.
+ * @param {number} offsetLevel - User's offset level (0–100), reflecting eco-actions taken.
+ * @param {object} shopUpgrades - Object containing purchased island assets.
+ */
+function updateRealmFromCarbonScore(carbonKg, offsetLevel, shopUpgrades = {}) {
+  if (!scene) return; // Guard: only update if scene is initialized
+
+  // Normalize offset to 0–100 proxy
+  const cleanness = Math.min(100, Math.max(0, offsetLevel || 0));
+
+  // Compute greenness: higher offset + shop upgrades = greener
+  const greenness = Math.min(100, cleanness + (shopUpgrades.meadowGreenness || 0));
+  const waterClean = Math.min(100, cleanness + (shopUpgrades.waterCleanliness || 0));
+
+  // Compute smog density: high carbon = dense smog, low carbon = clear atmosphere
+  // carbonKg range: 0 (pristine) – 20,000+ kg (very polluted); normalize to 0.005–0.04
+  const normalizedCarbon = Math.min(1, carbonKg / 15000);
+  const fogDensity = 0.005 + normalizedCarbon * 0.035;
+
+  // Update atmospheric fog
+  if (scene.fog) {
+    gsap.to(scene.fog, { density: fogDensity, duration: 2.0 });
+  }
+
+  // Compute smog color: clean (dark space #03050c) -> polluted (grey-brown #2a2218)
+  const r = Math.floor(3 + normalizedCarbon * 39);
+  const g = Math.floor(5 + normalizedCarbon * 29);
+  const b = Math.floor(12 + normalizedCarbon * 12);
+  if (renderer) {
+    renderer.setClearColor(new THREE.Color(`rgb(${r},${g},${b})`));
+  }
+
+  // Update grass and water based on offset level
+  if (grassMaterial) {
+    const newGrassColor = getGrassColor(greenness);
+    gsap.to(grassMaterial.color, { r: newGrassColor.r, g: newGrassColor.g, b: newGrassColor.b, duration: 2.0 });
+  }
+  if (waterMaterial) {
+    const newWaterColor = getWaterColor(waterClean);
+    gsap.to(waterMaterial.color, { r: newWaterColor.r, g: newWaterColor.g, b: newWaterColor.b, duration: 2.0 });
+  }
+
+  // Update islandData and sync trees/assets
+  islandData.meadowGreenness = greenness;
+  islandData.waterCleanliness = waterClean;
+
+  // Combine shop upgrades and carbon offset rewards
+  islandData.trees = (shopUpgrades.trees || 0) + Math.min(8, Math.floor(cleanness / 12.5));
+  islandData.flowers = shopUpgrades.flowers || 0;
+  islandData.solarPanels = shopUpgrades.solarPanels || 0;
+  islandData.windTurbines = shopUpgrades.windTurbines || 0;
+
+  syncAssets();
+}
+
+// Expose to global scope for dashboard.js consumption
+window.updateRealmFromCarbonScore = updateRealmFromCarbonScore;
+

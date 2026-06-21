@@ -54,7 +54,8 @@ const protect = async (req, res, next) => {
       customTitleBought: profile.custom_title_bought,
       scanCompleted: profile.scan_completed,
       island: profile.island,
-      history: profile.history
+      history: profile.history,
+      role: profile.role
     };
 
     next();

@@ -16,6 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentLevel = window.initialLevel || 1;
 
+  // Throttle helper to prevent spamming server requests (e.g. max once per 1 second)
+  function throttle(func, limit = 1000) {
+    let inThrottle = false;
+    return function(...args) {
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
+
   // --- AUDIO SYNTHESIZER (WEB AUDIO API) ---
   let audioCtx = null;
   let isAudioActive = true;
@@ -72,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- INITIAL 3D SCENE SYNC ---
   if (window.initialIslandData && typeof initRealm3D === 'function') {
     initRealm3D('realm-canvas', window.initialIslandData);
+    if (typeof updateRealmFromCarbonScore === 'function') {
+      const startingCarbon = window.initialStartingCarbon || 16.0;
+      const remainingCarbon = Math.max(0, startingCarbon * 1000 - (window.initialCarbon || 0));
+      updateRealmFromCarbonScore(remainingCarbon, window.initialCarbon || 0, window.initialIslandData);
+    }
     updateXPBar(window.initialXP);
     
     // Draw initial avatar
@@ -304,7 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentLevel = user.level;
 
     // Dynamic 3D simulation refresh
-    if (typeof updateRealm3D === 'function') {
+    if (typeof updateRealmFromCarbonScore === 'function') {
+      const startingCarbon = user.startingCarbonScore || 16.0;
+      const remainingCarbon = Math.max(0, startingCarbon * 1000 - user.carbonOffset);
+      updateRealmFromCarbonScore(remainingCarbon, user.carbonOffset, user.island);
+    } else if (typeof updateRealm3D === 'function') {
       updateRealm3D(user.island);
     }
     attachHUDHoverSounds();
@@ -332,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- ACTIONS LOGGING (HABITS API) ---
   document.querySelectorAll('.btn-log').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', throttle(async () => {
       const habitId = btn.getAttribute('data-habit-id');
       try {
         const res = await fetch('/api/log-habit', {
@@ -355,12 +376,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         console.error("Habit log error:", err);
       }
-    });
+    }, 1000));
   });
 
   // --- ECO STORE DEPLOYMENTS API ---
   document.querySelectorAll('.btn-buy').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', throttle(async () => {
       const upgradeId = btn.getAttribute('data-upgrade-id');
       try {
         const res = await fetch('/api/buy-upgrade', {
@@ -380,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         console.error("Upgrade buy error:", err);
       }
-    });
+    }, 1000));
   });
 
   // --- RPG ACHIEVEMENT VALIDATOR ---
@@ -541,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- RPG SHOP PURCHASES API ---
-  window.buyXPBooster = async () => {
+  window.buyXPBooster = throttle(async () => {
     playClick();
     try {
       const res = await fetch('/api/buy-xp', {
@@ -563,9 +584,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(err) {
       console.error("XP purchase error:", err);
     }
-  };
+  }, 1000);
 
-  window.unlockSector6 = async () => {
+  window.unlockSector6 = throttle(async () => {
     playClick();
     try {
       const res = await fetch('/api/unlock-region', {
@@ -584,9 +605,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(err) {
       console.error("Region unlock error:", err);
     }
-  };
+  }, 1000);
 
-  window.buyCustomTitle = async () => {
+  window.buyCustomTitle = throttle(async () => {
     playClick();
     const titleSelect = document.getElementById('custom-title-select');
     const title = titleSelect.value;
@@ -608,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(err) {
       console.error("Title purchase error:", err);
     }
-  };
+  }, 1000);
 
   // --- DYNAMIC COMMUNITY FEED LOGS ---
   const feed = document.getElementById('community-feed');
@@ -809,8 +830,16 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: 1.5,
       ease: 'power2.out',
       onUpdate: () => {
-        valEl.textContent = counter.val.toFixed(1);
-        txtEl.textContent = counter.val.toFixed(1);
+        const val = counter.val;
+        valEl.textContent = val.toFixed(1);
+        txtEl.textContent = val.toFixed(1);
+        
+        // Populate Projections
+        const yearlyKg = val * 1000;
+        document.getElementById('proj-yearly').textContent = yearlyKg.toFixed(0);
+        document.getElementById('proj-monthly').textContent = (yearlyKg / 12).toFixed(0);
+        document.getElementById('proj-weekly').textContent = (yearlyKg / 52).toFixed(0);
+        document.getElementById('proj-daily').textContent = (yearlyKg / 365).toFixed(1);
       }
     });
 
@@ -824,6 +853,39 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       lblEl.textContent = "DIAGNOSTIC: CRITICAL CORE DISCHARGE";
       lblEl.style.color = "var(--accent-red)";
+    }
+
+    // Populate AI Recommendations
+    const recsList = document.getElementById('ai-recs-list');
+    recsList.innerHTML = "";
+
+    const answers = {
+      1: carbonAnswers[1]?.option,
+      2: carbonAnswers[2]?.option,
+      3: carbonAnswers[3]?.option,
+      4: carbonAnswers[4]?.option
+    };
+
+    if (answers[1] === 'car') {
+      recsList.innerHTML += `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Transit Recommendation:</strong> Switch to active transit or rails weekly to save up to 3,300 kg CO2/year.</span></div>`;
+    } else {
+      recsList.innerHTML += `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Transit Status:</strong> Your green transit profile is highly optimal!</span></div>`;
+    }
+
+    if (answers[2] === 'meat') {
+      recsList.innerHTML += `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Dietary Recommendation:</strong> Integrating a few meatless days can reduce food-system greenhouse impacts by up to 2,000 kg CO2/year.</span></div>`;
+    }
+
+    if (answers[3] === 'coal') {
+      recsList.innerHTML += `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Energy Recommendation:</strong> Turn down high heating settings, transition to LED lighting, and choose smart green sockets to trim shelter emissions.</span></div>`;
+    }
+
+    if (answers[4] === 'landfill') {
+      recsList.innerHTML += `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Waste Recommendation:</strong> Sort recyclables and organic materials for local compost bins to cut landfill greenhouse loads by 60%.</span></div>`;
+    }
+    
+    if (recsList.innerHTML === "") {
+      recsList.innerHTML = `<div style="display: flex; gap: 8px;"><i class="fa-solid fa-circle-chevron-right" style="color: var(--accent-green); margin-top: 3px;"></i> <span><strong>Biosphere Core Balance:</strong> All sector metrics are currently functioning at optimal efficiency!</span></div>`;
     }
   }
 

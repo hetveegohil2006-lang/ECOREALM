@@ -1,26 +1,15 @@
-// Global error handling middleware
+/**
+ * Global error handling middleware.
+ * Renders cyberpunk HTML error pages for browser requests,
+ * and returns structured JSON for API/AJAX requests.
+ * @param {Error} err - The error object thrown or passed via next(err).
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
-
-  // Mongoose bad ObjectId
-  if (err.name === 'CastError') {
-    statusCode = 404;
-    message = `Resource not found with id: ${err.value}`;
-  }
-
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    statusCode = 400;
-    const field = Object.keys(err.keyValue)[0];
-    message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
-  }
-
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    statusCode = 400;
-    message = Object.values(err.errors).map((e) => e.message).join(', ');
-  }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
@@ -32,12 +21,26 @@ const errorHandler = (err, req, res, next) => {
     message = 'Token expired. Please log in again.';
   }
 
+  // Log the error for server diagnostics
   console.error(`[ERROR] ${statusCode} — ${message}`);
   if (process.env.NODE_ENV === 'development') {
     console.error(err.stack);
   }
 
-  res.status(statusCode).json({
+  // Determine if the request expects HTML (browser navigation) or JSON (API/AJAX)
+  const acceptsHtml = req.headers.accept && req.headers.accept.includes('text/html');
+  const isApiRoute = req.path.startsWith('/api/');
+
+  if (acceptsHtml && !isApiRoute) {
+    // Render the appropriate cyberpunk error view
+    return res.status(statusCode).render(
+      statusCode === 404 ? '404' : '500',
+      { err: process.env.NODE_ENV !== 'production' ? err : null, path: req.path }
+    );
+  }
+
+  // JSON response for API consumers
+  return res.status(statusCode).json({
     success: false,
     error: message,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
@@ -45,3 +48,4 @@ const errorHandler = (err, req, res, next) => {
 };
 
 module.exports = errorHandler;
+

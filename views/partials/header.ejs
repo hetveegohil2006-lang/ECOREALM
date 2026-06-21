@@ -39,6 +39,9 @@
 </head>
 <body>
 
+<!-- Accessibility: Skip to main content link (visible on Tab focus) -->
+<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
 <!-- ============================================================
      GLOBAL LOGO NAV — Injected on every single page.
      Clicking navigates to the Command Center (dashboard home).
@@ -48,8 +51,9 @@
 <a id="global-logo-nav"
    href="/"
    title="Return to Command Center"
+   aria-label="EcoREALM — Return to Command Center"
    onclick="logoNavClick(event)">
-  <div class="global-logo-icon">
+  <div class="global-logo-icon" aria-hidden="true">
     <i class="fa-solid fa-satellite-dish"></i>
   </div>
   <span class="global-logo-wordmark">EcoREALM</span>

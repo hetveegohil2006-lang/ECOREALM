@@ -33,38 +33,42 @@
   <div class="hud-grid" style="height: calc(100vh - 100px); margin-top: 20px;">
     
     <!-- Sidebar Navigation -->
-    <aside class="hud-sidebar" style="background: rgba(8,12,24,0.65);">
+    <aside class="hud-sidebar" style="background: rgba(8,12,24,0.65);" role="navigation" aria-label="Knowledge Center navigation">
       <div class="hud-menu-group">
         <span class="hud-menu-header">Museum Directory</span>
         
-        <button class="hud-tab-btn active" onclick="switchKnowledgeSection('carbon-core')">
-          <i class="fa-solid fa-cloud-arrow-down"></i> <span>1. Carbon Footprint</span>
+        <button class="hud-tab-btn active" onclick="switchKnowledgeSection('carbon-core')" aria-label="Section 1: Carbon Footprint" aria-current="true">
+          <i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i> <span>1. Carbon Footprint</span>
         </button>
         
-        <button class="hud-tab-btn" onclick="switchKnowledgeSection('biosphere-deck')">
-          <i class="fa-solid fa-leaf"></i> <span>2. Why It Matters</span>
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('biosphere-deck')" aria-label="Section 2: Why It Matters">
+          <i class="fa-solid fa-leaf" aria-hidden="true"></i> <span>2. Why It Matters</span>
         </button>
         
-        <button class="hud-tab-btn" onclick="switchKnowledgeSection('climate-effects')">
-          <i class="fa-solid fa-triangle-exclamation"></i> <span>3. Climate Effects</span>
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('climate-effects')" aria-label="Section 3: Climate Effects">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span>3. Climate Effects</span>
         </button>
         
-        <button class="hud-tab-btn" onclick="switchKnowledgeSection('how-help')">
-          <i class="fa-solid fa-circle-check"></i> <span>4. How Can You Help</span>
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('how-help')" aria-label="Section 4: How Can You Help">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>4. How Can You Help</span>
         </button>
         
-        <button class="hud-tab-btn" onclick="switchKnowledgeSection('realm-mission')">
-          <i class="fa-solid fa-satellite"></i> <span>5. EcoREALM Mission</span>
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('realm-mission')" aria-label="Section 5: EcoREALM Mission">
+          <i class="fa-solid fa-satellite" aria-hidden="true"></i> <span>5. EcoREALM Mission</span>
         </button>
         
-        <button class="hud-tab-btn" onclick="switchKnowledgeSection('facts-hub')">
-          <i class="fa-solid fa-terminal"></i> <span>6. Climate Facts Hub</span>
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('facts-hub')" aria-label="Section 6: Climate Facts Hub">
+          <i class="fa-solid fa-terminal" aria-hidden="true"></i> <span>6. Climate Facts Hub</span>
+        </button>
+
+        <button class="hud-tab-btn" onclick="switchKnowledgeSection('climate-quiz')" aria-label="Section 7: Interactive Climate Quiz">
+          <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> <span>7. Interactive Quiz</span>
         </button>
       </div>
     </aside>
 
     <!-- Main Content Area -->
-    <main class="hud-main-frame" id="knowledge-main-frame" style="padding: 0;">
+    <main class="hud-main-frame" id="main-content" role="main" aria-label="Knowledge Center content" style="padding: 0;">
       
       <!-- SECTION 1: WHAT IS A CARBON FOOTPRINT -->
       <section class="hud-viewport-screen active" id="sec-carbon-core">
@@ -105,7 +109,7 @@
             <span class="dossier-label-mini"><i class="fa-solid fa-wave-square glow-cyan"></i> DYNAMIC EMISSIONS VISUALIZER</span>
             
             <div class="sim-canvas-box" style="position:relative; flex:1; min-height:220px; border:1px solid rgba(0,240,255,0.08); border-radius:6px; background:rgba(3,5,12,0.9); overflow:hidden;">
-              <canvas id="carbon-particles-canvas" style="width:100%; height:100%; display:block;"></canvas>
+              <canvas id="carbon-particles-canvas" style="width:100%; height:100%; display:block;" role="img" aria-label="Dynamic carbon emissions simulation visualizer"></canvas>
             </div>
             
             <!-- Visualizer Sliders -->
@@ -273,42 +277,42 @@
             <span class="dossier-label-mini">TOGGLE COMPLETED RESTORATION CHECKS</span>
             
             <div style="display:grid; grid-template-rows: repeat(6, 1fr); gap:8px;">
-              <div class="cyber-check-card" onclick="toggleHelpCheck(1)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(1)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(1);}">
                 <div class="check-box-indicator" id="help-check-1"></div>
                 <div class="check-details">
                   <span class="check-label">Optimize Utility Load (LEDs/Standby)</span>
                   <p class="check-desc-mini">Unplug devices, shut off lights, wash laundry at 30°C.</p>
                 </div>
               </div>
-              <div class="cyber-check-card" onclick="toggleHelpCheck(2)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(2)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(2);}">
                 <div class="check-box-indicator" id="help-check-2"></div>
                 <div class="check-details">
                   <span class="check-label">Transit Network Shifting (Public transit/Cycling)</span>
                   <p class="check-desc-mini">Bypass fossil combustion cars for electric rails, bikes, or walks.</p>
                 </div>
               </div>
-              <div class="cyber-check-card" onclick="toggleHelpCheck(3)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(3)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(3);}">
                 <div class="check-box-indicator" id="help-check-3"></div>
                 <div class="check-details">
                   <span class="check-label">Sow Native Flora (Plant Trees/Gardening)</span>
                   <p class="check-desc-mini">Reforest soil blocks, support local farming plots.</p>
                 </div>
               </div>
-              <div class="cyber-check-card" onclick="toggleHelpCheck(4)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(4)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(4);}">
                 <div class="check-box-indicator" id="help-check-4"></div>
                 <div class="check-details">
                   <span class="check-label">Reduce Plastic Packaging Deficits</span>
                   <p class="check-desc-mini">Bring reusable containers, reject single-use plastic cups.</p>
                 </div>
               </div>
-              <div class="cyber-check-card" onclick="toggleHelpCheck(5)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(5)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(5);}">
                 <div class="check-box-indicator" id="help-check-5"></div>
                 <div class="check-details">
                   <span class="check-label">Hydraulic Flow Conservation</span>
                   <p class="check-desc-mini">Shorten showers, use low-flow fixtures, collect rainwater.</p>
                 </div>
               </div>
-              <div class="cyber-check-card" onclick="toggleHelpCheck(6)">
+              <div class="cyber-check-card" onclick="toggleHelpCheck(6)" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleHelpCheck(6);}">
                 <div class="check-box-indicator" id="help-check-6"></div>
                 <div class="check-details">
                   <span class="check-label">Sort Waste and Compost Loops</span>
@@ -405,6 +409,58 @@
                 <span style="color:var(--text-muted);">RENEWABLE SHARE:</span>
                 <span class="text-green" style="font-size:0.95rem; font-weight:bold;">30.2%</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 7: INTERACTIVE CLIMATE QUIZ -->
+      <section class="hud-viewport-screen" id="sec-climate-quiz" style="display:none; opacity:0;">
+        <div class="view-header">
+          <div class="view-title-box">
+            <span class="view-title-main">Climate Science Evaluation Core</span>
+            <span class="view-title-desc">Test your biosphere awareness and compile environmental database links</span>
+          </div>
+        </div>
+        
+        <div class="glass-panel" style="padding:40px; display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; min-height:380px;">
+          <div id="knowledge-quiz-box" style="width: 100%; max-width: 600px;">
+            <!-- Quiz Step 1: Start Quiz -->
+            <div id="k-quiz-intro" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-lightbulb glow-yellow" style="font-size:3.5rem; margin-bottom:20px; color: #ffe600; text-shadow: 0 0 10px rgba(255,230,0,0.5);"></i>
+              <h3 class="cyber-title" style="font-size:1.5rem; margin-bottom:15px; text-align: center;">Eco-Awareness Evaluation</h3>
+              <p style="color:var(--text-cyan); font-size:0.92rem; line-height:1.6; margin-bottom:25px;">
+                Demonstrate your biosphere comprehension. Successfully complete the evaluation to verify your credentials as a restoration guardian.
+              </p>
+              <button class="btn-cyber green-theme" style="padding:10px 30px;" onclick="startKnowledgeQuiz()">
+                Initialize Assessment Core
+              </button>
+            </div>
+
+            <!-- Quiz Step 2: Question Display -->
+            <div id="k-quiz-question-box" style="display:none; text-align: left;">
+              <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:5px;">
+                <span>EVALUATION PROTOCOL</span>
+                <span id="k-quiz-progress">QUESTION 1/5</span>
+              </div>
+              <h4 id="k-quiz-question-text" style="font-size:1.15rem; color:#fff; line-height:1.5; margin-bottom:20px; font-weight:bold;">Question goes here?</h4>
+              
+              <div class="carbon-options-list" id="k-quiz-options" style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                <!-- Dynamically populated options buttons -->
+              </div>
+            </div>
+
+            <!-- Quiz Step 3: Complete -->
+            <div id="k-quiz-complete" style="display:none;">
+              <i class="fa-solid fa-circle-check glow-green" style="font-size:4rem; margin-bottom:20px; color: var(--accent-green);"></i>
+              <h3 class="cyber-title" style="font-size:1.6rem; color:var(--accent-green); margin-bottom:10px; text-align: center;">ASSESSMENT COMPLETED</h3>
+              <p style="color:#fff; font-size:1.1rem; font-family:var(--font-mono); margin-bottom:15px; text-align: center;" id="k-quiz-score-lbl">Score: 5 / 5</p>
+              <p style="color:var(--text-cyan); font-size:0.9rem; line-height:1.5; max-width:450px; margin: 0 auto 25px auto; text-align: center;" id="k-quiz-feedback">
+                Outstanding telemetry synchronization. You have successfully updated your biosphere education databases.
+              </p>
+              <button class="btn-cyber" style="padding:10px 24px;" onclick="resetKnowledgeQuiz()">
+                Run Diagnostic Again
+              </button>
             </div>
           </div>
         </div>
